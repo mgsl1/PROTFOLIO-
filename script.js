@@ -189,7 +189,7 @@ const translations = {
     "footer.copy": "Construit à partir de zéro, sans templates."
   },
   ar: {
-    "meta.title": "محمد عبده — مطوّر برمجيات",
+    "meta.title": "محمد عبدو — مطوّر برمجيات",
     "nav.home": "الرئيسية",
     "nav.about": "من أنا",
     "nav.projects": "المشاريع",
