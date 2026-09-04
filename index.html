@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="meta.title">Mohamed Abdo — Software Developer</title>
+<link rel="icon" href="assets/logo-transparent.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#" class="logo"><img src="assets/logo-transparent.png" alt="Mohamed Abdo" class="logo-img"></a>
+
+    <nav class="nav-links" id="navLinks">
+      <a href="#home" class="active" data-i18n="nav.home">Home</a>
+      <a href="#about" data-i18n="nav.about">About</a>
+      <a href="#projects" data-i18n="nav.projects">Projects</a>
+      <a href="#services" data-i18n="nav.services">Services</a>
+      <a href="#contact" data-i18n="nav.contact">Contact</a>
+    </nav>
+
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light / dark mode">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="2" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="22" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <div class="lang-switcher" id="langSwitcher">
+        <button class="lang-current" id="langBtn" aria-haspopup="true" aria-expanded="false">
+          <img src="https://flagcdn.com/w40/gb.png" alt="" id="langFlag" class="flag-img">
+          <span id="langCode">EN</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <ul class="lang-menu" id="langMenu">
+          <li data-lang="ar"><img src="https://flagcdn.com/w40/dz.png" alt="" class="flag-img"> العربية</li>
+          <li data-lang="fr"><img src="https://flagcdn.com/w40/fr.png" alt="" class="flag-img"> Français</li>
+          <li data-lang="en"><img src="https://flagcdn.com/w40/gb.png" alt="" class="flag-img"> English</li>
+        </ul>
+      </div>
+      <a href="#contact" class="btn btn-primary btn-small" data-i18n="nav.cta">Let's Talk</a>
+    </div>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+<div class="nav-overlay" id="navOverlay"></div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="floating-icons" aria-hidden="true">
+    <span class="f-icon f-icon-1">&lt;/&gt;</span>
+    <span class="f-icon f-icon-2">{ }</span>
+    <span class="f-icon f-icon-3">( )</span>
+    <span class="f-icon f-icon-4">#</span>
+    <span class="f-icon f-icon-5">01</span>
+    <span class="f-icon f-icon-6">;</span>
+    <span class="f-icon f-icon-7">&lt;div&gt;</span>
+    <span class="f-icon f-icon-8">fn()</span>
+    <span class="f-icon f-icon-9">[ ]</span>
+    <span class="f-icon f-icon-10">=&gt;</span>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-text">
+      <span class="pill"><span class="dot"></span><span data-i18n="hero.available">Available for work</span></span>
+      <h1><span data-i18n="hero.title.line1">I Build Digital</span><br><span class="grad-text" data-i18n="hero.title.line2">Experiences</span></h1>
+      <p class="hero-sub" data-i18n="hero.sub">Full-stack developer specializing in Flutter mobile apps, real-time web dashboards, and Firebase-backed products — from first line of code to production.</p>
+      <div class="hero-actions">
+        <a href="#projects" class="btn btn-primary"><span data-i18n="hero.viewwork">View My Work</span> <span class="arrow">&rarr;</span></a>
+        <a href="assets/cv.pdf" class="btn btn-outline" download data-i18n="hero.downloadcv">Download CV</a>
+      </div>
+      <div class="tech-row">
+        <span class="tech-label" data-i18n="hero.techstack">Tech Stack</span>
+        <div class="tech-icons">
+          <div class="tech-badge" title="Flutter" data-icon="flutter"></div>
+          <div class="tech-badge" title="Dart" data-icon="dart"></div>
+          <div class="tech-badge" title="Firebase" data-icon="firebase"></div>
+          <div class="tech-badge" title="JavaScript" data-icon="javascript"></div>
+          <div class="tech-badge" title="Node.js" data-icon="node"></div>
+          <div class="tech-badge" title="PHP" data-icon="php"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="device laptop">
+        <div class="laptop-screen">
+          <div class="window-bar"><span></span><span></span><span></span></div>
+          <pre class="code-block"><span class="c-key">import</span> <span class="c-str">'Flutter'</span>;
+
+<span class="c-key">class</span> <span class="c-fn">Developer</span> {
+  <span class="c-fn">build</span>() {
+    <span class="c-key">return</span> Product(
+      name: <span class="c-str">'Cisterna'</span>,
+      stack: [<span class="c-str">'Flutter'</span>, <span class="c-str">'Firebase'</span>],
+      status: <span class="c-str">'Live'</span>,
+    );
+  }
+}</pre>
+        </div>
+        <div class="laptop-base"></div>
+      </div>
+      <div class="device phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="phone-topbar">
+            <span>9:41</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><circle cx="12" cy="20" r="1"></circle></svg>
+          </div>
+          <p class="phone-label">Dashboard</p>
+          <p class="phone-metric">$24,780 <span class="phone-metric-delta">+12.9%</span></p>
+          <div class="phone-bars">
+            <span style="height:35%"></span><span style="height:55%"></span>
+            <span style="height:40%"></span><span style="height:70%"></span>
+            <span style="height:50%"></span><span style="height:85%"></span>
+            <span style="height:60%"></span>
+          </div>
+          <div class="phone-list">
+            <div class="phone-row"><span>Order #128</span><b>$250</b></div>
+            <div class="phone-row"><span>Order #129</span><b>$180</b></div>
+            <div class="phone-row"><span>Order #130</span><b>$320</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PROJECTS -->
+<section class="section" id="projects">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow" data-i18n="projects.eyebrow">Featured Work</p>
+        <h2><span data-i18n="projects.heading.line1">Selected</span> <span class="grad-text" data-i18n="projects.heading.line2">Projects</span></h2>
+      </div>
+      <a href="#" class="link-arrow"><span data-i18n="projects.viewall">View All Projects</span> <span class="arrow">&rarr;</span></a>
+    </div>
+
+    <div class="filters" id="filters">
+      <!-- Filters loaded from backend -->
+    </div>
+
+    <div class="projects-grid" id="projectsGrid">
+      <!-- Projects loaded exclusively from backend — no defaults -->
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section about" id="about">
+  <div class="container about-grid">
+    <div class="about-text">
+      <p class="eyebrow" data-i18n="about.eyebrow">About Me</p>
+      <h2><span data-i18n="about.imtext">I'm</span> <span class="grad-text" data-i18n="about.name">Mohamed Abdo</span></h2>
+      <p class="hero-sub" data-i18n="about.bio">Full-stack developer focused on building complete, real-world products — mobile apps in Flutter, real-time dashboards, and Firebase-backed systems people actually use every day.</p>
+      <div class="stats-row">
+        <div class="stat"><b>55+</b><span data-i18n="about.stat1">Products Shipped</span></div>
+        <div class="stat"><b>43+</b><span data-i18n="about.stat2">Platforms Mastered</span></div>
+        <div class="stat"><b>15+</b><span data-i18n="about.stat3">Technologies</span></div>
+      </div>
+      <a href="#contact" class="btn btn-outline"><span data-i18n="about.more">More About Me</span> &rarr;</a>
+    </div>
+    <div class="about-photo">
+      <img src="assets/avatar.jpg" alt="Mohamed Abdo avatar" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES + TECH -->
+<section class="section" id="services">
+  <div class="container split-grid">
+    <div>
+      <p class="eyebrow" data-i18n="services.eyebrow">What I Do</p>
+      <h2><span data-i18n="services.heading.line1">Services I</span> <span class="grad-text" data-i18n="services.heading.line2">Provide</span></h2>
+      <div class="service-grid">
+        <div class="service-card">
+          <span class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"></rect><line x1="11" y1="18" x2="13" y2="18"></line></svg></span>
+          <h4 data-i18n="service.mobile.title">Mobile App Development</h4>
+          <p data-i18n="service.mobile.desc">Native-feel Android &amp; iOS apps built with Flutter — one codebase, smooth UI, live tracking, push notifications and offline support.</p>
+        </div>
+        <div class="service-card">
+          <span class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></span>
+          <h4 data-i18n="service.web.title">Web Application Development</h4>
+          <p data-i18n="service.web.desc">Fast, responsive websites and web apps with React, Next.js and modern JavaScript — clean UI and strong performance on every device.</p>
+        </div>
+        <div class="service-card">
+          <span class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="8" rx="2"></rect><rect x="2" y="13" width="20" height="8" rx="2"></rect><line x1="6" y1="7" x2="6.01" y2="7"></line><line x1="6" y1="17" x2="6.01" y2="17"></line></svg></span>
+          <h4 data-i18n="service.backend.title">Backend Development From Scratch</h4>
+          <p data-i18n="service.backend.desc">Full backend systems built from zero with Node.js, PHP/Laravel or Firebase — authentication, business logic and APIs designed to scale.</p>
+        </div>
+        <div class="service-card">
+          <span class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></span>
+          <h4 data-i18n="service.api.title">API Design &amp; Integration</h4>
+          <p data-i18n="service.api.desc">Clean, documented REST and real-time APIs, plus integration with payment gateways, maps, SMS and any third-party service you need.</p>
+        </div>
+        <div class="service-card">
+          <span class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4.03 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"></path></svg></span>
+          <h4 data-i18n="service.database.title">Database Design &amp; Management</h4>
+          <p data-i18n="service.database.desc">Well-structured databases with Firebase/Firestore, MySQL, PostgreSQL or MongoDB — optimized queries and secure, lasting data models.</p>
+        </div>
+        <div class="service-card">
+          <span class="service-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"></path></svg></span>
+          <h4 data-i18n="service.realtime.title">Real-time Features</h4>
+          <p data-i18n="service.realtime.desc">Live tracking, chat, notifications and dashboards that update instantly — powered by WebSockets, Firestore streams or Socket.io.</p>
+        </div>
+        <div class="service-card">
+          <span class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></span>
+          <h4 data-i18n="service.dashboard.title">Admin Dashboards &amp; Analytics</h4>
+          <p data-i18n="service.dashboard.desc">Custom admin panels and analytics dashboards to manage orders, users and data — live charts and role-based access.</p>
+        </div>
+        <div class="service-card">
+          <span class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12v9"></path><path d="m16 16-4-4-4 4"></path><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path></svg></span>
+          <h4 data-i18n="service.devops.title">Deployment, DevOps &amp; Maintenance</h4>
+          <p data-i18n="service.devops.desc">App store publishing, server setup, CI/CD pipelines, and ongoing maintenance to keep your product running smoothly after launch.</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p class="eyebrow" data-i18n="tech.eyebrow">Technologies</p>
+      <h2><span data-i18n="tech.heading.line1">Technologies I</span> <span class="grad-text" data-i18n="tech.heading.line2">Use</span></h2>
+      <div class="tech-grid">
+        <div class="tech-chip"><div class="tech-badge" data-icon="flutter"></div>Flutter</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="dart"></div>Dart</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="firebase"></div>Firebase</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="javascript"></div>JavaScript</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="typescript"></div>TypeScript</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="node"></div>Node.js</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="php"></div>PHP</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="laravel"></div>Laravel</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="python"></div>Python</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="java"></div>Java</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="react"></div>React</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="vue"></div>Vue.js</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="html5"></div>HTML5</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="css3"></div>CSS3</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="mysql"></div>MySQL</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="postgresql"></div>PostgreSQL</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="mongodb"></div>MongoDB</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="docker"></div>Docker</div>
+        <div class="tech-chip"><div class="tech-badge" data-icon="git"></div>Git</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT / FOOTER -->
+<footer class="footer" id="contact">
+  <div class="container footer-inner">
+    <div>
+      <a href="#" class="logo"><img src="assets/logo-transparent.png" alt="Mohamed Abdo" class="logo-img"></a>
+      <p class="footer-tagline" data-i18n="footer.tagline">Let's build something people actually use.</p>
+    </div>
+    <div class="footer-links">
+      <a href="mailto:you@example.com">
+        <span class="social-icon" data-social="email"></span>
+        <span data-i18n="footer.email">Email</span>
+      </a>
+      <a href="#" target="_blank" rel="noopener">
+        <span class="social-icon" data-social="linkedin"></span>
+        LinkedIn
+      </a>
+      <a href="#" target="_blank" rel="noopener">
+        <span class="social-icon" data-social="github"></span>
+        GitHub
+      </a>
+      <a href="#" target="_blank" rel="noopener">
+        <span class="social-icon" data-social="whatsapp"></span>
+        WhatsApp
+      </a>
+    </div>
+  </div>
+  <p class="footer-copy">© <span id="year"></span> Mohamed Abdo — <span data-i18n="footer.copy">Built from scratch, no templates.</span></p>
+</footer>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="script.js"></script>
+<script src="backend.js"></script>
+</body>
+</html>
