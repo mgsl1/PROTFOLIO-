@@ -317,6 +317,79 @@ html[data-theme="light"] .f-icon{ opacity:.16; text-shadow:0 0 14px #a9700f30; }
 }
 .project-card:hover{ transform:translateY(-4px); border-color:#ffffff2e; }
 .project-card:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+.project-like-wrap{
+  position:absolute; bottom:12px; right:12px; z-index:2;
+}
+html[dir="rtl"] .project-like-wrap{ right:auto; left:12px; }
+.like-btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:9px 14px; border-radius:999px;
+  border:1.5px solid rgba(255,255,255,.28);
+  background:rgba(8,10,20,.88);
+  backdrop-filter:blur(10px);
+  color:#fff;
+  font-size:.88rem; font-weight:700; cursor:pointer;
+  box-shadow:0 6px 18px -6px #000000aa;
+  transition:background .2s, border-color .2s, color .2s, transform .2s, box-shadow .2s;
+}
+.like-btn .heart-icon{
+  display:block; flex:none; width:20px; height:20px;
+  transition:transform .2s, filter .2s;
+}
+/* Unliked: white outline heart */
+.like-btn .heart-outline path{
+  fill:transparent;
+  stroke:#fff;
+  stroke-width:1.7;
+  stroke-linejoin:round;
+}
+/* Liked: solid bright red heart — very obvious */
+.like-btn.liked{
+  color:#fff;
+  background:linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+  border-color:#fb7185;
+  box-shadow:0 8px 22px -6px #e11d4888, 0 0 0 1px #e11d4833;
+}
+.like-btn.liked .heart-filled path,
+.like-btn.liked .heart-icon path{
+  fill:#fff;
+  stroke:none;
+}
+.like-btn:hover:not(.liked){
+  color:#fff;
+  border-color:#fb7185;
+  background:rgba(20,8,14,.92);
+}
+.like-btn:hover:not(.liked) .heart-outline path{
+  stroke:#fb7185;
+  fill:rgba(251,113,133,.15);
+}
+.like-btn.liked:hover{
+  filter:brightness(1.08);
+}
+.like-btn .like-count{
+  min-width:1ch;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.02em;
+}
+.like-btn.like-pop{ animation:likePop .42s cubic-bezier(.2,.9,.3,1.4); }
+@keyframes likePop{
+  0%{ transform:scale(1); }
+  35%{ transform:scale(1.22); }
+  70%{ transform:scale(.96); }
+  100%{ transform:scale(1); }
+}
+.like-btn-lg{
+  padding:11px 18px; font-size:.95rem;
+}
+.like-btn-lg .heart-icon{ width:22px; height:22px; }
+.pm-title-row{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:14px;
+  margin-bottom:6px;
+}
+.pm-title-text{ min-width:0; flex:1; }
+.pm-title-text .pm-badge{ margin-bottom:10px; }
+.pm-title-text h2{ margin:0; }
 .project-thumb{
   position:relative; height:230px; padding:22px;
   background:radial-gradient(120% 120% at 20% 0%, #1c2140 0%, #0d0f1c 65%);

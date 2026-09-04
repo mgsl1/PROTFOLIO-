@@ -143,6 +143,232 @@ function paintTechnologies() {
 }
 
 /* ============================================================
+   PROJECT LIKES (heart) — anonymous via visitor_key + RPC
+============================================================ */
+const LIKES_STORAGE_KEY = "portfolio_liked_projects";
+
+function getVisitorKey() {
+  let key = localStorage.getItem("portfolio_visitor_key");
+  if (!key) {
+    key = (crypto.randomUUID && crypto.randomUUID()) ||
+      ("v_" + Math.random().toString(36).slice(2) + Date.now().toString(36));
+    localStorage.setItem("portfolio_visitor_key", key);
+  }
+  return key;
+}
+
+/* ---------- analytics: site visits + project views ---------- */
+async function trackSiteVisit() {
+  if (!sbClient) return;
+  try {
+    const visitorKey = getVisitorKey();
+    const today = new Date().toISOString().slice(0, 10);
+    const stampKey = `portfolio_visit_${today}`;
+    // One recorded visit per browser per day (keeps dashboard numbers clean)
+    if (localStorage.getItem(stampKey)) return;
+    localStorage.setItem(stampKey, "1");
+    await sbClient.from("site_visits").insert({
+      path: location.pathname || "/",
+      visitor_key: visitorKey,
+    });
+  } catch (e) {
+    console.warn("site_visits tracking skipped:", e?.message || e);
+  }
+}
+
+async function trackProjectView(projectId) {
+  if (!sbClient || !projectId) return;
+  try {
+    const sessionKey = `portfolio_viewed_${projectId}`;
+    // Count at most once per tab session for the same project
+    if (sessionStorage.getItem(sessionKey)) return;
+    sessionStorage.setItem(sessionKey, "1");
+
+    // Prefer RPC (atomic). Fallback: read + update.
+    const { error: rpcErr } = await sbClient.rpc("increment_project_views", { p_id: projectId });
+    if (rpcErr) {
+      const { data } = await sbClient.from("projects").select("views_count").eq("id", projectId).maybeSingle();
+      const next = (Number(data?.views_count) || 0) + 1;
+      await sbClient.from("projects").update({ views_count: next }).eq("id", projectId);
+      const proj = (DYN.projects || []).find((p) => String(p.id) === String(projectId));
+      if (proj) proj.views_count = next;
+    } else {
+      const proj = (DYN.projects || []).find((p) => String(p.id) === String(projectId));
+      if (proj) proj.views_count = (Number(proj.views_count) || 0) + 1;
+    }
+  } catch (e) {
+    console.warn("project view tracking skipped:", e?.message || e);
+  }
+}
+
+function getLikedSet() {
+  try {
+    const raw = localStorage.getItem(LIKES_STORAGE_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return new Set(Array.isArray(arr) ? arr : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveLikedSet(set) {
+  localStorage.setItem(LIKES_STORAGE_KEY, JSON.stringify([...set]));
+}
+
+function hasLiked(projectId) {
+  return getLikedSet().has(String(projectId));
+}
+
+function formatLikeCount(n) {
+  const num = Number(n) || 0;
+  if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+  if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, "") + "k";
+  return String(num);
+}
+
+function heartSvg(filled) {
+  // Filled path always — unliked state is styled via CSS (outline look);
+  // liked state forces solid red fill so the change is obvious.
+  const cls = filled ? "heart-icon heart-filled" : "heart-icon heart-outline";
+  return `<svg class="${cls}" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+  </svg>`;
+}
+
+function likeLabel(liked) {
+  return {
+    en: liked ? "Unlike" : "Like",
+    fr: liked ? "Retirer" : "J'aime",
+    ar: liked ? "إزالة الإعجاب" : "إعجاب",
+  }[currentLang()] || (liked ? "Unlike" : "Like");
+}
+
+function applyLikeVisual(btn, liked) {
+  if (!btn) return;
+  btn.classList.toggle("liked", liked);
+  btn.setAttribute("aria-pressed", liked ? "true" : "false");
+  const label = likeLabel(liked);
+  btn.setAttribute("aria-label", label);
+  btn.title = label;
+  const icon = btn.querySelector(".heart-icon");
+  if (icon) {
+    // Swap SVG markup so fill/outline is unmistakable
+    const wrap = document.createElement("div");
+    wrap.innerHTML = heartSvg(liked);
+    icon.replaceWith(wrap.firstElementChild);
+  }
+}
+
+function likeButtonHtml(projectId, count, sizeClass = "") {
+  const liked = hasLiked(projectId);
+  const label = likeLabel(liked);
+  return `
+    <button type="button" class="like-btn${liked ? " liked" : ""}${sizeClass ? " " + sizeClass : ""}"
+      data-project-id="${escHtml(String(projectId))}"
+      aria-pressed="${liked ? "true" : "false"}"
+      aria-label="${escHtml(label)}"
+      title="${escHtml(label)}">
+      ${heartSvg(liked)}
+      <span class="like-count">${escHtml(formatLikeCount(count))}</span>
+    </button>
+  `;
+}
+
+async function toggleProjectLike(projectId, btn) {
+  if (!sbClient || !projectId) return;
+  if (btn.dataset.busy === "1") return;
+  btn.dataset.busy = "1";
+
+  const likedSet = getLikedSet();
+  const idStr = String(projectId);
+  const currentlyLiked = likedSet.has(idStr);
+  const visitorKey = getVisitorKey();
+  const countEl = btn.querySelector(".like-count");
+  const prevCount = Number((DYN.projects || []).find((p) => String(p.id) === idStr)?.likes_count) || 0;
+
+  // Optimistic UI — heart turns solid red when liked
+  if (currentlyLiked) {
+    likedSet.delete(idStr);
+    applyLikeVisual(btn, false);
+    if (countEl) countEl.textContent = formatLikeCount(Math.max(0, prevCount - 1));
+  } else {
+    likedSet.add(idStr);
+    applyLikeVisual(btn, true);
+    if (countEl) countEl.textContent = formatLikeCount(prevCount + 1);
+    btn.classList.remove("like-pop");
+    void btn.offsetWidth; // restart animation
+    btn.classList.add("like-pop");
+    setTimeout(() => btn.classList.remove("like-pop"), 450);
+  }
+  saveLikedSet(likedSet);
+
+  try {
+    if (currentlyLiked) {
+      // Remove like
+      const { error } = await sbClient
+        .from("project_likes")
+        .delete()
+        .eq("project_id", projectId)
+        .eq("visitor_key", visitorKey);
+      if (error) throw error;
+    } else {
+      const { error } = await sbClient
+        .from("project_likes")
+        .insert({ project_id: projectId, visitor_key: visitorKey });
+      if (error) {
+        // unique violation = already liked on server — ignore
+        if (error.code !== "23505") throw error;
+      }
+    }
+
+    // Refresh count from server (trigger maintains likes_count)
+    const { data } = await sbClient
+      .from("projects")
+      .select("likes_count")
+      .eq("id", projectId)
+      .maybeSingle();
+    if (data && typeof data.likes_count === "number") {
+      const proj = (DYN.projects || []).find((p) => String(p.id) === idStr);
+      if (proj) proj.likes_count = data.likes_count;
+      if (countEl) countEl.textContent = formatLikeCount(data.likes_count);
+      // Sync any other like buttons for same project
+      document.querySelectorAll(`.like-btn[data-project-id="${CSS.escape(idStr)}"]`).forEach((other) => {
+        if (other === btn) return;
+        const c = other.querySelector(".like-count");
+        if (c) c.textContent = formatLikeCount(data.likes_count);
+        applyLikeVisual(other, likedSet.has(idStr));
+      });
+    }
+  } catch (err) {
+    console.warn("Like failed:", err);
+    // Revert optimistic update
+    if (currentlyLiked) {
+      likedSet.add(idStr);
+      applyLikeVisual(btn, true);
+    } else {
+      likedSet.delete(idStr);
+      applyLikeVisual(btn, false);
+    }
+    saveLikedSet(likedSet);
+    if (countEl) countEl.textContent = formatLikeCount(prevCount);
+  } finally {
+    btn.dataset.busy = "0";
+  }
+}
+
+function wireLikeButtons(root = document) {
+  root.querySelectorAll(".like-btn").forEach((btn) => {
+    if (btn.dataset.wired === "1") return;
+    btn.dataset.wired = "1";
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleProjectLike(btn.dataset.projectId, btn);
+    });
+  });
+}
+
+/* ============================================================
    PROJECTS + CATEGORIES (with client-side filtering)
 ============================================================ */
 function paintProjects() {
@@ -178,10 +404,12 @@ function paintProjects() {
       .filter(Boolean)
       .map((n) => `<span class="tag">${escHtml(n)}</span>`).join("");
     const img = p.cover_image_url || p.thumbnail_url;
+    const likes = p.likes_count ?? 0;
     return `
       <article class="project-card reveal${p.featured ? " featured" : ""}" data-cat="${escHtml(catSlugs)}" data-project-idx="${idx}" role="button" tabindex="0">
         <div class="project-thumb" style="${img ? `background:center/cover no-repeat url('${escHtml(img)}');` : ""}">
           ${p.badge ? `<span class="project-badge">${escHtml(pickI18n(p.badge))}</span>` : ""}
+          <div class="project-like-wrap">${likeButtonHtml(p.id, likes)}</div>
         </div>
         <div class="project-body">
           <h3>${escHtml(pickI18n(p.title))}</h3>
@@ -197,19 +425,25 @@ function paintProjects() {
     gridWrap.querySelectorAll(".project-card").forEach((el) => revealObserver.observe(el));
   }
 
-  // Click / keyboard → open project detail modal
+  // Click / keyboard → open project detail modal (ignore clicks on like button)
   gridWrap.querySelectorAll(".project-card").forEach((card) => {
-    const open = () => {
+    const open = (e) => {
+      if (e.target.closest(".like-btn")) return;
       const idx = Number(card.dataset.projectIdx);
       const project = projects[idx];
       if (project) openProjectModal(project);
     };
     card.addEventListener("click", open);
     card.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+      if (e.key === "Enter" || e.key === " ") {
+        if (e.target.closest(".like-btn")) return;
+        e.preventDefault();
+        open(e);
+      }
     });
   });
 
+  wireLikeButtons(gridWrap);
   wireProjectFilters();
 }
 
@@ -260,6 +494,8 @@ function closeProjectModal() {
 
 function openProjectModal(p) {
   closeProjectModal(); // ensure only one
+  // Count a project view when the visitor opens its details
+  trackProjectView(p?.id);
 
   const gallery = getProjectGallery(p);
   const techTags = (p.project_technologies || [])
@@ -343,8 +579,13 @@ function openProjectModal(p) {
       <div class="pm-layout">
         ${galleryHtml}
         <div class="pm-content">
-          ${p.badge ? `<span class="pm-badge">${escHtml(pickI18n(p.badge))}</span>` : ""}
-          <h2 id="pmTitle">${escHtml(pickI18n(p.title))}</h2>
+          <div class="pm-title-row">
+            <div class="pm-title-text">
+              ${p.badge ? `<span class="pm-badge">${escHtml(pickI18n(p.badge))}</span>` : ""}
+              <h2 id="pmTitle">${escHtml(pickI18n(p.title))}</h2>
+            </div>
+            ${likeButtonHtml(p.id, p.likes_count ?? 0, "like-btn-lg")}
+          </div>
           ${pickI18n(p.short_description) ? `<p class="pm-lead">${escHtml(pickI18n(p.short_description))}</p>` : ""}
           ${metaBits.length ? `<div class="pm-meta">${metaBits.join("")}</div>` : ""}
           ${techTags ? `<div class="tag-row pm-tags">${techTags}</div>` : ""}
@@ -389,6 +630,7 @@ function openProjectModal(p) {
   document.body.appendChild(overlay);
   document.body.style.overflow = "hidden";
   requestAnimationFrame(() => overlay.classList.add("show"));
+  wireLikeButtons(overlay);
 
   // Close handlers
   overlay.querySelector(".pm-close").addEventListener("click", closeProjectModal);
@@ -597,6 +839,9 @@ async function initBackend() {
   repaintAllDynamic();
   paintContactInfo();
   paintSocialLinks();
+
+  // Record a site visit (once per visitor per day)
+  trackSiteVisit();
 }
 
 initBackend();
