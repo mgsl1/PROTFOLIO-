@@ -169,7 +169,7 @@ function paintProjects() {
     return;
   }
 
-  gridWrap.innerHTML = projects.map((p) => {
+  gridWrap.innerHTML = projects.map((p, idx) => {
     const catSlugs = (p.project_category_links || [])
       .map((l) => (categories.find((c) => c.id === l.category_id) || {}).slug)
       .filter(Boolean).join(" ");
@@ -179,7 +179,7 @@ function paintProjects() {
       .map((n) => `<span class="tag">${escHtml(n)}</span>`).join("");
     const img = p.cover_image_url || p.thumbnail_url;
     return `
-      <article class="project-card reveal${p.featured ? " featured" : ""}" data-cat="${escHtml(catSlugs)}">
+      <article class="project-card reveal${p.featured ? " featured" : ""}" data-cat="${escHtml(catSlugs)}" data-project-idx="${idx}" role="button" tabindex="0">
         <div class="project-thumb" style="${img ? `background:center/cover no-repeat url('${escHtml(img)}');` : ""}">
           ${p.badge ? `<span class="project-badge">${escHtml(pickI18n(p.badge))}</span>` : ""}
         </div>
@@ -196,6 +196,19 @@ function paintProjects() {
   if (typeof revealObserver !== "undefined") {
     gridWrap.querySelectorAll(".project-card").forEach((el) => revealObserver.observe(el));
   }
+
+  // Click / keyboard → open project detail modal
+  gridWrap.querySelectorAll(".project-card").forEach((card) => {
+    const open = () => {
+      const idx = Number(card.dataset.projectIdx);
+      const project = projects[idx];
+      if (project) openProjectModal(project);
+    };
+    card.addEventListener("click", open);
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+    });
+  });
 
   wireProjectFilters();
 }
@@ -214,6 +227,211 @@ function wireProjectFilters() {
       });
     });
   });
+}
+
+/* ============================================================
+   PROJECT DETAIL MODAL (gallery + full info)
+============================================================ */
+function getProjectGallery(p) {
+  const media = [...(p.project_media || [])]
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  const urls = media
+    .filter((m) => m.url)
+    .map((m) => ({ url: m.url, type: m.media_type || "image", caption: pickI18n(m.caption), is_cover: !!m.is_cover }));
+
+  // Fallback to cover / thumbnail / logo if no gallery rows
+  if (!urls.length) {
+    [p.cover_image_url, p.thumbnail_url, p.logo_url].filter(Boolean).forEach((url) => {
+      urls.push({ url, type: "image", caption: "", is_cover: false });
+    });
+  }
+  // Put cover first if marked
+  urls.sort((a, b) => (b.is_cover ? 1 : 0) - (a.is_cover ? 1 : 0));
+  return urls;
+}
+
+function closeProjectModal() {
+  const overlay = document.getElementById("projectModalOverlay");
+  if (!overlay) return;
+  overlay.classList.remove("show");
+  document.body.style.overflow = "";
+  setTimeout(() => overlay.remove(), 280);
+}
+
+function openProjectModal(p) {
+  closeProjectModal(); // ensure only one
+
+  const gallery = getProjectGallery(p);
+  const techTags = (p.project_technologies || [])
+    .map((pt) => pt.technologies && pt.technologies.name)
+    .filter(Boolean)
+    .map((n) => `<span class="tag">${escHtml(n)}</span>`).join("");
+
+  const features = (() => {
+    const f = p.features;
+    if (!f) return [];
+    if (Array.isArray(f)) return f.map(pickI18n).filter(Boolean);
+    if (typeof f === "object") {
+      // i18n list: { en: [...], fr: [...], ar: [...] }
+      const arr = f[currentLang()] || f.en || f.fr || f.ar || [];
+      return Array.isArray(arr) ? arr.filter(Boolean) : [];
+    }
+    return [];
+  })();
+
+  const links = [
+    { key: "demo_url", label: { en: "Live Demo", fr: "Démo", ar: "تجربة حية" }, icon: "▶" },
+    { key: "website_url", label: { en: "Website", fr: "Site web", ar: "الموقع" }, icon: "🌐" },
+    { key: "github_url", label: { en: "GitHub", fr: "GitHub", ar: "GitHub" }, icon: "⌥" },
+    { key: "app_store_url", label: { en: "App Store", fr: "App Store", ar: "App Store" }, icon: "" },
+    { key: "play_store_url", label: { en: "Play Store", fr: "Play Store", ar: "Play Store" }, icon: "▶" },
+    { key: "video_url", label: { en: "Video", fr: "Vidéo", ar: "فيديو" }, icon: "🎬" },
+  ].filter((l) => p[l.key]);
+
+  const metaBits = [];
+  if (p.client_name) metaBits.push(`<span><strong>${escHtml({ en: "Client", fr: "Client", ar: "العميل" }[currentLang()] || "Client")}:</strong> ${escHtml(p.client_name)}${p.client_country ? ` · ${escHtml(p.client_country)}` : ""}</span>`);
+  if (p.year) metaBits.push(`<span><strong>${escHtml({ en: "Year", fr: "Année", ar: "السنة" }[currentLang()] || "Year")}:</strong> ${escHtml(p.year)}</span>`);
+  if (p.start_date || p.end_date) {
+    const range = [p.start_date, p.end_date].filter(Boolean).map((d) => {
+      try { return new Date(d).toLocaleDateString(currentLang() === "ar" ? "ar-DZ" : currentLang() === "fr" ? "fr-FR" : "en-GB", { year: "numeric", month: "short" }); }
+      catch { return d; }
+    }).join(" – ");
+    metaBits.push(`<span><strong>${escHtml({ en: "Period", fr: "Période", ar: "الفترة" }[currentLang()] || "Period")}:</strong> ${escHtml(range)}</span>`);
+  }
+
+  const labels = {
+    problem: { en: "Problem", fr: "Problème", ar: "المشكلة" },
+    solution: { en: "Solution", fr: "Solution", ar: "الحل" },
+    features: { en: "Key features", fr: "Fonctionnalités clés", ar: "أبرز الميزات" },
+    about: { en: "About the project", fr: "À propos du projet", ar: "عن المشروع" },
+    close: { en: "Close", fr: "Fermer", ar: "إغلاق" },
+  };
+  const L = (k) => labels[k][currentLang()] || labels[k].en;
+
+  const galleryHtml = gallery.length
+    ? `
+      <div class="pm-gallery">
+        <div class="pm-main">
+          ${gallery[0].type === "video"
+            ? `<video src="${escHtml(gallery[0].url)}" controls playsinline></video>`
+            : `<img src="${escHtml(gallery[0].url)}" alt="${escHtml(pickI18n(p.title))}" id="pmMainImg">`}
+          ${gallery.length > 1 ? `
+            <button type="button" class="pm-nav pm-prev" aria-label="Previous">‹</button>
+            <button type="button" class="pm-nav pm-next" aria-label="Next">›</button>
+          ` : ""}
+        </div>
+        ${gallery.length > 1 ? `
+          <div class="pm-thumbs">
+            ${gallery.map((g, i) => `
+              <button type="button" class="pm-thumb${i === 0 ? " active" : ""}" data-idx="${i}">
+                ${g.type === "video"
+                  ? `<span class="pm-thumb-video">🎬</span>`
+                  : `<img src="${escHtml(g.url)}" alt="">`}
+              </button>
+            `).join("")}
+          </div>
+        ` : ""}
+      </div>`
+    : `<div class="pm-gallery pm-gallery-empty"></div>`;
+
+  const overlay = document.createElement("div");
+  overlay.id = "projectModalOverlay";
+  overlay.className = "pm-overlay";
+  overlay.innerHTML = `
+    <div class="pm-dialog" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+      <button type="button" class="pm-close" aria-label="${escHtml(L("close"))}">×</button>
+      <div class="pm-layout">
+        ${galleryHtml}
+        <div class="pm-content">
+          ${p.badge ? `<span class="pm-badge">${escHtml(pickI18n(p.badge))}</span>` : ""}
+          <h2 id="pmTitle">${escHtml(pickI18n(p.title))}</h2>
+          ${pickI18n(p.short_description) ? `<p class="pm-lead">${escHtml(pickI18n(p.short_description))}</p>` : ""}
+          ${metaBits.length ? `<div class="pm-meta">${metaBits.join("")}</div>` : ""}
+          ${techTags ? `<div class="tag-row pm-tags">${techTags}</div>` : ""}
+          ${links.length ? `
+            <div class="pm-links">
+              ${links.map((l) => `
+                <a class="pm-link" href="${escHtml(p[l.key])}" target="_blank" rel="noopener noreferrer">
+                  <span>${l.icon}</span> ${escHtml(l.label[currentLang()] || l.label.en)}
+                </a>
+              `).join("")}
+            </div>
+          ` : ""}
+          ${pickI18n(p.full_description) ? `
+            <div class="pm-section">
+              <h3>${escHtml(L("about"))}</h3>
+              <p>${escHtml(pickI18n(p.full_description)).replace(/\n/g, "<br>")}</p>
+            </div>
+          ` : ""}
+          ${pickI18n(p.problem) ? `
+            <div class="pm-section">
+              <h3>${escHtml(L("problem"))}</h3>
+              <p>${escHtml(pickI18n(p.problem)).replace(/\n/g, "<br>")}</p>
+            </div>
+          ` : ""}
+          ${pickI18n(p.solution) ? `
+            <div class="pm-section">
+              <h3>${escHtml(L("solution"))}</h3>
+              <p>${escHtml(pickI18n(p.solution)).replace(/\n/g, "<br>")}</p>
+            </div>
+          ` : ""}
+          ${features.length ? `
+            <div class="pm-section">
+              <h3>${escHtml(L("features"))}</h3>
+              <ul class="pm-features">${features.map((f) => `<li>${escHtml(f)}</li>`).join("")}</ul>
+            </div>
+          ` : ""}
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  document.body.style.overflow = "hidden";
+  requestAnimationFrame(() => overlay.classList.add("show"));
+
+  // Close handlers
+  overlay.querySelector(".pm-close").addEventListener("click", closeProjectModal);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) closeProjectModal(); });
+  const onKey = (e) => {
+    if (e.key === "Escape") { closeProjectModal(); document.removeEventListener("keydown", onKey); }
+  };
+  document.addEventListener("keydown", onKey);
+
+  // Gallery navigation
+  if (gallery.length > 1) {
+    let current = 0;
+    const main = overlay.querySelector(".pm-main");
+    const thumbs = overlay.querySelectorAll(".pm-thumb");
+
+    function show(i) {
+      current = (i + gallery.length) % gallery.length;
+      const g = gallery[current];
+      if (g.type === "video") {
+        main.querySelector("img, video")?.remove();
+        const v = document.createElement("video");
+        v.src = g.url;
+        v.controls = true;
+        v.playsInline = true;
+        main.insertBefore(v, main.firstChild);
+      } else {
+        let img = main.querySelector("img");
+        if (!img) {
+          main.querySelector("video")?.remove();
+          img = document.createElement("img");
+          img.id = "pmMainImg";
+          img.alt = pickI18n(p.title);
+          main.insertBefore(img, main.firstChild);
+        }
+        img.src = g.url;
+      }
+      thumbs.forEach((t, ti) => t.classList.toggle("active", ti === current));
+    }
+
+    overlay.querySelector(".pm-prev")?.addEventListener("click", (e) => { e.stopPropagation(); show(current - 1); });
+    overlay.querySelector(".pm-next")?.addEventListener("click", (e) => { e.stopPropagation(); show(current + 1); });
+    thumbs.forEach((t) => t.addEventListener("click", (e) => { e.stopPropagation(); show(Number(t.dataset.idx)); }));
+  }
 }
 
 /* ============================================================
@@ -362,7 +580,7 @@ async function initBackend() {
     safe("project_categories", sbClient.from("project_categories").select("*").order("sort_order")),
     safe("social_links", sbClient.from("social_links").select("*").order("sort_order")),
     safe("projects", sbClient.from("projects")
-      .select("*, project_category_links(category_id), project_technologies(technologies(name))")
+      .select("*, project_category_links(category_id), project_technologies(technologies(name)), project_media(*)")
       .eq("status", "published").eq("is_visible", true).order("sort_order")),
   ]);
 
