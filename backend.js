@@ -239,7 +239,34 @@ function paintSocialLinks() {
 
 /* ============================================================
    CONTACT FORM (insert into contact_messages)
+   Fully multilingual — placeholders & button update on language switch
 ============================================================ */
+const contactFormI18n = {
+  name:       { en: "Your name",                    fr: "Votre nom",                          ar: "الاسم الكامل" },
+  email:      { en: "Your email",                   fr: "Votre e-mail",                       ar: "البريد الإلكتروني" },
+  subject:    { en: "Subject",                      fr: "Sujet",                              ar: "الموضوع" },
+  message:    { en: "Tell me about your project…",  fr: "Parlez-moi de votre projet…",        ar: "أخبرني عن مشروعك…" },
+  send:       { en: "Send Message",                 fr: "Envoyer le message",                 ar: "إرسال الرسالة" },
+  sending:    { en: "Sending…",                     fr: "Envoi en cours…",                    ar: "جارٍ الإرسال…" },
+  success:    { en: "Thanks! I'll get back to you soon.", fr: "Merci ! Je vous répondrai bientôt.", ar: "شكرًا لك! سأرد عليك قريبًا." },
+  error:      { en: "Couldn't send — please try again later.", fr: "Échec de l'envoi — réessayez plus tard.", ar: "تعذّر الإرسال — حاول لاحقًا." },
+};
+
+function updateContactFormLanguage() {
+  const form = document.getElementById("contactForm");
+  if (!form) return;
+  const nameInput    = form.querySelector('input[name="name"]');
+  const emailInput   = form.querySelector('input[name="email"]');
+  const subjectInput = form.querySelector('input[name="subject"]');
+  const messageArea  = form.querySelector('textarea[name="message"]');
+  const sendBtnSpan  = form.querySelector('button[type="submit"] span');
+  if (nameInput)    nameInput.placeholder    = pickI18n(contactFormI18n.name);
+  if (emailInput)   emailInput.placeholder   = pickI18n(contactFormI18n.email);
+  if (subjectInput) subjectInput.placeholder = pickI18n(contactFormI18n.subject);
+  if (messageArea)  messageArea.placeholder  = pickI18n(contactFormI18n.message);
+  if (sendBtnSpan)  sendBtnSpan.textContent  = pickI18n(contactFormI18n.send);
+}
+
 function buildContactForm() {
   const footer = document.querySelector("footer.footer#contact");
   if (!footer || document.getElementById("contactForm")) return;
@@ -250,17 +277,17 @@ function buildContactForm() {
   wrap.innerHTML = `
     <form id="contactForm" style="max-width:640px; margin:0 auto; display:grid; gap:14px;">
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
-        <input required name="name" type="text" placeholder="${pickI18n({ en: "Your name", fr: "Votre nom", ar: "الاسم الكامل" })}"
+        <input required name="name" type="text" placeholder="${pickI18n(contactFormI18n.name)}"
           style="background:#ffffff08; border:1px solid var(--border); color:var(--text); padding:12px 14px; border-radius:10px; font-family:var(--font-body);">
-        <input required name="email" type="email" placeholder="${pickI18n({ en: "Your email", fr: "Votre e-mail", ar: "البريد الإلكتروني" })}"
+        <input required name="email" type="email" placeholder="${pickI18n(contactFormI18n.email)}"
           style="background:#ffffff08; border:1px solid var(--border); color:var(--text); padding:12px 14px; border-radius:10px; font-family:var(--font-body);">
       </div>
-      <input name="subject" type="text" placeholder="${pickI18n({ en: "Subject", fr: "Sujet", ar: "الموضوع" })}"
+      <input name="subject" type="text" placeholder="${pickI18n(contactFormI18n.subject)}"
         style="background:#ffffff08; border:1px solid var(--border); color:var(--text); padding:12px 14px; border-radius:10px; font-family:var(--font-body);">
-      <textarea required name="message" rows="5" placeholder="${pickI18n({ en: "Tell me about your project…", fr: "Parlez-moi de votre projet…", ar: "أخبرني عن مشروعك…" })}"
+      <textarea required name="message" rows="5" placeholder="${pickI18n(contactFormI18n.message)}"
         style="background:#ffffff08; border:1px solid var(--border); color:var(--text); padding:12px 14px; border-radius:10px; font-family:var(--font-body); resize:vertical;"></textarea>
       <button type="submit" class="btn btn-primary" style="justify-self:start;">
-        <span>${pickI18n({ en: "Send Message", fr: "Envoyer", ar: "إرسال الرسالة" })}</span>
+        <span>${pickI18n(contactFormI18n.send)}</span>
       </button>
       <p id="contactFormStatus" style="font-size:.85rem; color:var(--text-dim); min-height:1.2em;"></p>
     </form>
@@ -275,17 +302,17 @@ function buildContactForm() {
     const btn = form.querySelector("button[type='submit']");
     const data = Object.fromEntries(new FormData(form).entries());
     btn.disabled = true;
-    statusEl.textContent = pickI18n({ en: "Sending…", fr: "Envoi…", ar: "جارٍ الإرسال…" });
+    statusEl.textContent = pickI18n(contactFormI18n.sending);
     try {
       const { error } = await sbClient.from("contact_messages").insert({
         name: data.name, email: data.email, subject: data.subject || null,
         message: data.message, language: currentLang(), status: "new",
       });
       if (error) throw error;
-      statusEl.textContent = pickI18n({ en: "Thanks! I'll get back to you soon.", fr: "Merci ! Je vous répondrai bientôt.", ar: "شكرًا لك! سأرد عليك قريبًا." });
+      statusEl.textContent = pickI18n(contactFormI18n.success);
       form.reset();
     } catch (err) {
-      statusEl.textContent = pickI18n({ en: "Couldn't send — please try again later.", fr: "Échec de l'envoi — réessayez plus tard.", ar: "تعذّر الإرسال — حاول لاحقًا." });
+      statusEl.textContent = pickI18n(contactFormI18n.error);
       console.error(err);
     } finally {
       btn.disabled = false;
@@ -303,6 +330,7 @@ function repaintAllDynamic() {
   paintServices();
   paintTechnologies();
   paintProjects();
+  updateContactFormLanguage();
 }
 document.querySelectorAll(".lang-menu li").forEach((li) => {
   li.addEventListener("click", () => setTimeout(repaintAllDynamic, 0));
