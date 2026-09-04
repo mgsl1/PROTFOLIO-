@@ -189,7 +189,7 @@ const translations = {
     "footer.copy": "Construit à partir de zéro, sans templates."
   },
   ar: {
-    "meta.title": "محمد عبدو — مطوّر برمجيات",
+    "meta.title": "محمد عبده — مطوّر برمجيات",
     "nav.home": "الرئيسية",
     "nav.about": "من أنا",
     "nav.projects": "المشاريع",
@@ -285,6 +285,9 @@ function applyLanguage(lang) {
   });
 
   localStorage.setItem("site-lang", lang);
+
+  // Notify AI chat (and any other listeners) of instant language change
+  document.dispatchEvent(new CustomEvent("site-lang-changed", { detail: { lang } }));
 }
 
 function initLanguage() {
@@ -413,3 +416,542 @@ revealTargets.forEach(el => revealObserver.observe(el));
 ========================================================= */
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+/* =========================================================
+   AI Chat Widget — multilingual portfolio assistant
+   Loads settings + intents from Supabase so everything is
+   controllable from the Admin dashboard. Falls back to local
+   defaults if tables are missing or offline.
+========================================================= */
+(function initAiChat() {
+  async function boot() {
+  const widget = document.getElementById('aiChatWidget');
+  const fab = document.getElementById('aiFab');
+  const panel = document.getElementById('aiChatPanel');
+  const messagesEl = document.getElementById('aiChatMessages');
+  const form = document.getElementById('aiChatForm');
+  const input = document.getElementById('aiChatInput');
+  const sendBtn = document.getElementById('aiChatSend');
+  const closeBtn = document.getElementById('aiChatClose');
+  const clearBtn = document.getElementById('aiChatClear');
+  const suggestionsEl = document.getElementById('aiChatSuggestions');
+  if (!widget || !fab || !panel) {
+    console.warn('[AI Chat] Widget elements not found in DOM');
+    return;
+  }
+
+  /* ---- Remote knowledge from Supabase ---- */
+  let remoteSettings = null;
+  let remoteIntents = [];
+
+  async function loadRemoteAI() {
+    const client = (typeof sbClient !== 'undefined' && sbClient)
+      ? sbClient
+      : ((window.supabase && typeof SUPABASE_URL !== 'undefined')
+          ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+          : null);
+    if (!client) return;
+    try {
+      const [settingsRes, intentsRes] = await Promise.all([
+        client.from('ai_chat_settings').select('*').limit(1).maybeSingle(),
+        client.from('ai_chat_intents').select('*').eq('is_active', true)
+          .order('priority', { ascending: false })
+          .order('sort_order', { ascending: true }),
+      ]);
+      if (settingsRes.data) remoteSettings = settingsRes.data;
+      if (Array.isArray(intentsRes.data)) remoteIntents = intentsRes.data;
+    } catch (err) {
+      console.warn('[AI Chat] Could not load remote config:', err);
+    }
+  }
+
+  await loadRemoteAI();
+
+  // Hide AI icon completely when disabled from the Admin dashboard
+  if (remoteSettings && remoteSettings.is_enabled === false) {
+    widget.style.display = 'none';
+    widget.setAttribute('aria-hidden', 'true');
+    widget.innerHTML = ''; // remove FAB + panel from DOM entirely
+    return;
+  }
+
+  function pickI18nLocal(val, lang) {
+    if (val == null) return '';
+    if (typeof val === 'string') return val;
+    return val[lang] || val.en || val.fr || val.ar || Object.values(val)[0] || '';
+  }
+
+  const chatI18n = {
+    en: {
+      status: 'Online · AI Assistant',
+      placeholder: 'Ask me anything about the site…',
+      greeting: "Hello! I'm Mohamed Abdo, the developer. Ask me anything — projects (Cisterna, ShopHub…), services, Flutter, real-time systems, tech stack, pricing, availability, process, or how we can work together.",
+      suggestions: [
+        'What services do you offer?',
+        'Tell me about Cisterna',
+        'How can I contact you?',
+        'What technologies do you use?',
+        'Are you available for hire?'
+      ],
+      thinking: 'Thinking…',
+      fallback: "I can help with anything related to this portfolio: projects, services, Flutter & mobile, real-time dashboards, tech stack, pricing, process, contact, or availability. Try rephrasing or ask in English, French, or Arabic.",
+      cleared: 'Chat cleared. How can I help you?'
+    },
+    fr: {
+      status: 'En ligne · Assistant IA',
+      placeholder: 'Posez-moi n’importe quelle question…',
+      greeting: "Bonjour ! Je suis Mohamed Abdo, le développeur. Posez toutes vos questions — projets (Cisterna, ShopHub…), services, Flutter, systèmes temps réel, stack technique, budget, disponibilité, process, ou collaboration.",
+      suggestions: [
+        'Quels services offrez-vous ?',
+        'Parlez-moi de Cisterna',
+        'Comment vous contacter ?',
+        'Quelles technologies utilisez-vous ?',
+        'Êtes-vous disponible ?'
+      ],
+      thinking: 'Réflexion…',
+      fallback: "Je peux vous aider sur tout ce qui concerne ce portfolio : projets, services, Flutter & mobile, dashboards temps réel, stack technique, budget, process, contact ou disponibilité. Reformulez ou essayez en français, anglais ou arabe.",
+      cleared: 'Conversation effacée. Comment puis-je vous aider ?'
+    },
+    ar: {
+      status: 'متصل · مساعد ذكي',
+      placeholder: 'اسألني عن أي شيء يخص الموقع…',
+      greeting: 'مرحباً! أنا المطور محمد عبدو. اسأل عن أي شيء — المشاريع (Cisterna، ShopHub…)، الخدمات، Flutter، الأنظمة الحية، التقنيات، الأسعار، التوفر، طريقة العمل، أو كيف نبدأ معاً.',
+      suggestions: [
+        'ما هي خدماتك؟',
+        'أخبرني عن Cisterna',
+        'كيف أتواصل معك؟',
+        'ما التقنيات التي تستخدمها؟',
+        'هل أنت متاح للعمل؟'
+      ],
+      thinking: 'جاري التفكير…',
+      fallback: 'يمكنني المساعدة في كل ما يخص هذا الموقع: المشاريع، الخدمات، Flutter والموبايل، اللوحات الحية، التقنيات، الأسعار، طريقة العمل، التواصل أو التوفر. أعد صياغة السؤال أو جرّب بالعربية أو الإنجليزية أو الفرنسية.',
+      cleared: 'تم مسح المحادثة. كيف يمكنني مساعدتك؟'
+    }
+  };
+
+  // Overlay remote settings from admin (if present)
+  if (remoteSettings) {
+    ['en', 'fr', 'ar'].forEach((lang) => {
+      const map = {
+        status: remoteSettings.status_text,
+        placeholder: remoteSettings.placeholder,
+        greeting: remoteSettings.greeting,
+        fallback: remoteSettings.fallback,
+        cleared: remoteSettings.cleared_message,
+        thinking: remoteSettings.thinking_text,
+      };
+      Object.keys(map).forEach((k) => {
+        const v = pickI18nLocal(map[k], lang);
+        if (v) chatI18n[lang][k] = v;
+      });
+      // suggestions: expected as { en: [...], fr: [...], ar: [...] }
+      if (remoteSettings.suggestions && Array.isArray(remoteSettings.suggestions[lang])) {
+        chatI18n[lang].suggestions = remoteSettings.suggestions[lang];
+      }
+    });
+    // Update header name if provided
+    const nameEl = panel.querySelector('.ai-chat-name');
+    if (nameEl && remoteSettings.assistant_name) {
+      nameEl.textContent = pickI18nLocal(remoteSettings.assistant_name, siteLangSafe());
+    }
+  }
+
+  function siteLangSafe() {
+    const l = document.documentElement.lang || localStorage.getItem('site-lang') || 'en';
+    return (l === 'ar' || l === 'fr') ? l : 'en';
+  }
+
+  function siteLang() {
+    const l = document.documentElement.lang || localStorage.getItem('site-lang') || 'en';
+    return chatI18n[l] ? l : 'en';
+  }
+
+  function detectLang(text) {
+    if (!text) return siteLang();
+    if (/[\u0600-\u06FF]/.test(text)) return 'ar';
+    const lower = text.toLowerCase();
+    const frHints = /\b(bonjour|salut|merci|projet|service|comment|quels?|quelle|avez|vous|contact|prix|disponible)\b/;
+    if (frHints.test(lower)) return 'fr';
+    return siteLang();
+  }
+
+  function t(key, lang) {
+    const L = chatI18n[lang] || chatI18n.en;
+    return L[key] || chatI18n.en[key] || '';
+  }
+
+  function nowTime() {
+    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function appendMsg(role, text, lang) {
+    const wrap = document.createElement('div');
+    wrap.className = 'ai-msg ai-msg-' + (role === 'user' ? 'user' : 'bot');
+    const bubble = document.createElement('div');
+    bubble.className = 'ai-msg-bubble';
+    bubble.textContent = text;
+    const time = document.createElement('div');
+    time.className = 'ai-msg-time';
+    time.textContent = nowTime();
+    wrap.appendChild(bubble);
+    wrap.appendChild(time);
+    messagesEl.appendChild(wrap);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function showTyping() {
+    const wrap = document.createElement('div');
+    wrap.className = 'ai-msg ai-msg-bot';
+    wrap.id = 'aiTyping';
+    wrap.innerHTML = '<div class="ai-msg-bubble"><div class="ai-typing"><span></span><span></span><span></span></div></div>';
+    messagesEl.appendChild(wrap);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+  function hideTyping() {
+    document.getElementById('aiTyping')?.remove();
+  }
+
+  function renderSuggestions(lang) {
+    suggestionsEl.innerHTML = '';
+    (t('suggestions', lang) || []).forEach(label => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ai-suggest';
+      btn.textContent = label;
+      btn.addEventListener('click', () => {
+        input.value = label;
+        form.dispatchEvent(new Event('submit', { cancelable: true }));
+      });
+      suggestionsEl.appendChild(btn);
+    });
+  }
+
+  function updateChrome(lang) {
+    const statusEl = panel.querySelector('[data-i18n-chat="status"]');
+    if (statusEl) statusEl.textContent = t('status', lang);
+    if (input) input.placeholder = t('placeholder', lang);
+  }
+
+  /* ============================================================
+     Knowledge base — large multilingual intent matcher
+     Covers site content + common variations so the assistant
+     anticipates almost any question about the portfolio.
+  ============================================================ */
+  function replyFor(text, lang) {
+    const q = (text || '').toLowerCase().trim();
+    const isAr = lang === 'ar';
+    const isFr = lang === 'fr';
+
+    // ---- 1) Try remote intents from Admin (highest priority) ----
+    if (remoteIntents && remoteIntents.length) {
+      for (const intent of remoteIntents) {
+        const raw = (intent.keywords || '').toLowerCase();
+        const keywords = raw.split(/[\n,|]+/).map(s => s.trim()).filter(Boolean);
+        if (!keywords.length) continue;
+        let hit = false;
+        if (intent.match_mode === 'any_word') {
+          const words = q.split(/[\s,.!?؟،]+/).filter(Boolean);
+          hit = keywords.some(k => words.includes(k));
+        } else {
+          // default: contains
+          hit = keywords.some(k => q.includes(k));
+        }
+        if (hit) {
+          const reply = lang === 'ar' ? intent.reply_ar
+            : lang === 'fr' ? intent.reply_fr
+            : intent.reply_en;
+          if (reply && String(reply).trim()) return String(reply).trim();
+        }
+      }
+    }
+
+    // Helper: test if query matches any of the given patterns (local fallback)
+    const match = (...patterns) => patterns.some(p => {
+      if (p instanceof RegExp) return p.test(q);
+      return q.includes(String(p).toLowerCase());
+    });
+
+    /* ---------- Local fallback knowledge base ---------- */
+    /* ---------- Greetings / small talk ---------- */
+    if (
+      match(/^(hi|hello|hey|yo|salam|salaam|مرحبا|السلام|أهلا|اهلا|هاي|هلا|bonjour|salut|coucou|bonsoir|bonne?\s*journée)\b/,
+            'good morning', 'good evening', 'صباح', 'مساء', 'كيف حالك', 'كيفك', 'ça va', 'comment ça va')
+      || q.length < 3
+    ) {
+      return t('greeting', lang);
+    }
+
+    /* ---------- Who / About ---------- */
+    if (match(
+      /who are you|about you|about me|yourself|من أنت|من انت|عنك|عرفني|قدم نفسك|من هو|qui es[- ]?tu|présente[- ]?toi|à propos|parle de toi|ton profil/
+    )) {
+      if (isAr) return 'أنا محمد عبدو، مطور Full-stack أبني منتجات حقيقية من الصفر حتى الإطلاق:\n• تطبيقات موبايل بـ Flutter\n• لوحات تحكم وأنظمة حية (Real-time)\n• مواقع ويب ولوحات إدارة\n• تكاملات APIs وFirebase\nأركز على حلول عملية يستخدمها الناس فعلاً، وليس مجرد demos.';
+      if (isFr) return 'Je suis Mohamed Abdo, développeur full-stack. Je construis des produits concrets de A à Z :\n• Apps mobiles Flutter\n• Tableaux de bord & systèmes temps réel\n• Sites web & back-offices\n• Intégrations APIs & Firebase\nJe privilégie des solutions utiles que les gens utilisent vraiment.';
+      return 'I’m Mohamed Abdo, a full-stack developer. I build real products from first line of code to production:\n• Flutter mobile apps\n• Real-time dashboards & live systems\n• Websites & admin panels\n• APIs & Firebase integrations\nI focus on practical solutions people actually use — not just demos.';
+    }
+
+    /* ---------- Services (broad) ---------- */
+    if (match(
+      /service|services|ماذا تقدم|ما تقدم|وش تسوي|وش تقدم|what do you (do|offer)|what can you|quels? services|offrez|proposez|vos services|prestations|عرض|خدماتك|خدماتي/
+    )) {
+      if (isAr) return 'أقدم خدمات متكاملة من الفكرة حتى الإطلاق والصيانة:\n• تطبيقات موبايل (Flutter / Android / iOS)\n• لوحات تحكم ولوحات بيانات في الوقت الفعلي\n• مواقع ويب ولوحات إدارة (Admin panels)\n• APIs وتكاملات (دفع، خرائط، SMS، إشعارات)\n• نشر على المتاجر (App Store / Play Store) + DevOps وصيانة\nصف لي فكرتك وسأقترح أفضل نهج تقني وتقديراً أولياً.';
+      if (isFr) return 'Je propose des services complets de l’idée jusqu’au lancement et à la maintenance :\n• Apps mobiles (Flutter / Android / iOS)\n• Tableaux de bord & systèmes temps réel\n• Sites web & back-offices\n• APIs & intégrations (paiement, maps, SMS, notifications)\n• Publication stores + DevOps & maintenance\nDécrivez votre idée, je vous proposerai l’approche technique adaptée.';
+      return 'I offer end-to-end services from idea to launch & maintenance:\n• Mobile apps (Flutter / Android / iOS)\n• Real-time dashboards & live systems\n• Websites & admin panels\n• APIs & third-party integrations (payments, maps, SMS, notifications)\n• App Store / Play Store publishing + DevOps & ongoing maintenance\nTell me about your idea and I’ll suggest the right technical approach.';
+    }
+
+    /* ---------- Specific service: Mobile / Flutter ---------- */
+    if (match(
+      /flutter|mobile|تطبيق|تطبيقات|android|ios|app mobile|application mobile|موبايل|هاتف|phone app/
+    )) {
+      if (isAr) return 'نعم، تخصصي الرئيسي هو تطبيقات الموبايل بـ Flutter.\nأبني تطبيقات لنظامي Android و iOS من كود واحد، مع دعم:\n• واجهات حديثة وسلسة\n• إشعارات push\n• تكامل مع Firebase أو APIs خاصة\n• نشر على Google Play و App Store\nإذا عندك فكرة تطبيق، صفها لي وسأوضح لك كيف نبدأ.';
+      if (isFr) return 'Oui, mon spécialité principale est le développement mobile avec Flutter.\nJe construis des apps Android + iOS à partir d’une seule base de code, avec :\n• UI moderne et fluide\n• Notifications push\n• Intégration Firebase ou APIs custom\n• Publication sur le Play Store et l’App Store\nParlez-moi de votre idée d’app, je vous expliquerai comment on démarre.';
+      return 'Yes — mobile apps with Flutter are my core specialty.\nI build Android + iOS apps from a single codebase, including:\n• Modern, smooth UI\n• Push notifications\n• Firebase or custom API integration\n• Publishing to Google Play & App Store\nShare your app idea and I’ll outline how we can start.';
+    }
+
+    /* ---------- Specific: Real-time / Dashboard ---------- */
+    if (match(
+      /realtime|real-time|temps réel|temps reel|لوحة|dashboard|لوحة تحكم|لوحة بيانات|analytics|إحصائ|تتبع|live|مباشر|websocket|socket/
+    )) {
+      if (isAr) return 'نعم، أبني أنظمة ولوحات تحكم في الوقت الفعلي:\n• تتبع مباشر (موقع، حالة طلبات، حضور…)\n• لوحات بيانات حية (metrics, charts)\n• إشعارات فورية\n• دردشة أو أنظمة تواصل حية\nأستخدم Firebase، WebSockets أو حلول مشابهة حسب الحاجة.\nهل لديك نظام معين تريد جعله حياً؟';
+      if (isFr) return 'Oui, je développe des systèmes et tableaux de bord temps réel :\n• Suivi live (position, statut commandes, présence…)\n• Dashboards de métriques en direct\n• Notifications instantanées\n• Chat ou systèmes de communication live\nJ’utilise Firebase, WebSockets ou solutions équivalentes selon le besoin.\nAvez-vous un système précis à rendre temps réel ?';
+      return 'Yes — I build real-time systems and live dashboards:\n• Live tracking (location, order status, presence…)\n• Live metrics & charts\n• Instant notifications\n• Chat / live communication systems\nI use Firebase, WebSockets or similar depending on the project.\nDo you have a specific system you want to make real-time?';
+    }
+
+    /* ---------- Specific: Web / Backend / API ---------- */
+    if (match(
+      /web|website|site|موقع|backend|back-end|api|rest|node|php|server|serveur|لوحة إدارة|admin panel|back.?office/
+    )) {
+      if (isAr) return 'نعم، أبني أيضاً:\n• مواقع ويب سريعة وواضحة\n• لوحات إدارة (Admin panels)\n• APIs نظيفة وموثقة (REST أو real-time)\n• تكامل مع بوابات دفع، خرائط، SMS، وخدمات خارجية\nالتقنيات: JavaScript, Node.js, PHP, React, Vue + قواعد بيانات حسب المشروع.\nما نوع الموقع أو الـ API الذي تحتاجه؟';
+      if (isFr) return 'Oui, je développe aussi :\n• Sites web rapides et clairs\n• Back-offices / panels d’administration\n• APIs propres et documentées (REST ou temps réel)\n• Intégrations paiement, maps, SMS, services tiers\nStack : JavaScript, Node.js, PHP, React, Vue + bases de données selon le projet.\nQuel type de site ou d’API vous faut-il ?';
+      return 'Yes — I also build:\n• Fast, clear websites\n• Admin panels / back-offices\n• Clean, documented APIs (REST or real-time)\n• Integrations with payment gateways, maps, SMS and third-party services\nStack: JavaScript, Node.js, PHP, React, Vue + databases depending on the project.\nWhat kind of website or API do you need?';
+    }
+
+    /* ---------- Projects (general) ---------- */
+    if (match(
+      /project|projects|projet|projets|مشروع|مشاريع|أعمالك|portfolio|travaux|show me|أظهر|عرض|montrez|vos réalisations|what have you built|ماذا بنيت/
+    )) {
+      if (isAr) return 'من أبرز مشاريعي:\n• Cisterna — منصة توصيل صهاريج مياه (تطبيق عميل + تطبيق سائق + لوحة إدارة حية)\n• ShopHub — متجر إلكتروني كامل (سلة، دفع، إدارة طلبات)\n• Analytics Dashboard — لوحة ذكاء أعمال حية\n• Chatify — تطبيق مراسلة فورية مع مجموعات وحالة اتصال\nتصفح قسم المشاريع في الموقع للتفاصيل والصور. هل تريد تفاصيل عن مشروع معين؟';
+      if (isFr) return 'Quelques projets phares :\n• Cisterna — plateforme de livraison de citernes d’eau (app client, chauffeur, dashboard live)\n• ShopHub — e-commerce complet (panier, paiement, gestion commandes)\n• Analytics Dashboard — BI en temps réel\n• Chatify — messagerie temps réel (groupes, présence)\nExplorez la section Projets du site. Voulez-vous les détails d’un projet précis ?';
+      return 'Featured projects include:\n• Cisterna — water tanker delivery platform (customer app, driver app, live admin dashboard)\n• ShopHub — full e-commerce (cart, checkout, order management)\n• Analytics Dashboard — live business intelligence\n• Chatify — real-time messaging with groups & presence\nBrowse the Projects section on this site. Want details on a specific one?';
+    }
+
+    /* ---------- Specific project: Cisterna ---------- */
+    if (match(/cisterna|صهريج|صهاريج|تanker|water delivery|توصيل مياه|biskra|بسكرة/)) {
+      if (isAr) return 'Cisterna هو مشروعي الرئيسي:\nمنصة متكاملة لتوصيل صهاريج المياه في منطقة بسكرة.\nتتكون من:\n• تطبيق للعميل (طلب صهريج، تتبع، دفع)\n• تطبيق للسائق (استلام الطلبات، مسار، حالة)\n• لوحة إدارة حية (تتبع الأسطول، الطلبات، التقارير)\nكل شيء يعمل في الوقت الفعلي. هل تريد معرفة التقنيات المستخدمة أو كيف يمكن تطبيق فكرة مشابهة؟';
+      if (isFr) return 'Cisterna est mon projet phare :\nPlateforme complète de livraison de citernes d’eau pour la région de Biskra.\nElle comprend :\n• App client (commande, suivi, paiement)\n• App chauffeur (réception des courses, itinéraire, statut)\n• Dashboard admin live (flotte, commandes, rapports)\nTout fonctionne en temps réel. Voulez-vous les technos utilisées ou comment adapter une idée similaire ?';
+      return 'Cisterna is my flagship product:\nA complete water tanker delivery platform for the Biskra region.\nIt includes:\n• Customer app (order, track, pay)\n• Driver app (accept jobs, route, status)\n• Live admin dashboard (fleet tracking, orders, reports)\nEverything runs in real time. Want the tech stack or how a similar idea could be built?';
+    }
+
+    /* ---------- Specific: ShopHub / e-commerce ---------- */
+    if (match(/shophub|shop hub|e-?commerce|متجر|متجر إلكتروني|boutique|storefront|panier|سلة|checkout/)) {
+      if (isAr) return 'ShopHub متجر إلكتروني كامل المميزات:\n• عرض منتجات وتصنيفات\n• سلة مشتريات ودفع\n• إدارة طلبات\n• مصمم للسرعة والوضوح\nيمكن تخصيصه لأي نوع منتجات. هل تفكر في متجر إلكتروني؟';
+      if (isFr) return 'ShopHub est une boutique e-commerce complète :\n• Catalogue produits & catégories\n• Panier et paiement\n• Gestion des commandes\n• Pensée pour la vitesse et la clarté\nAdaptables à tout type de produits. Vous envisagez une boutique en ligne ?';
+      return 'ShopHub is a full-featured e-commerce storefront:\n• Product catalog & categories\n• Cart and checkout\n• Order management\n• Built for speed and clarity\nIt can be adapted to any product type. Thinking of an online store?';
+    }
+
+    /* ---------- Specific: Chatify ---------- */
+    if (match(/chatify|chat|messaging|مراسلة|دردشة|messagerie|group chat|presence|read receipt/)) {
+      if (isAr) return 'Chatify تطبيق مراسلة فورية يتضمن:\n• محادثات فردية وجماعية\n• حالة الاتصال (presence)\n• إشعارات القراءة\n• تجربة سلسة في الوقت الفعلي\nمثالي كأساس لأي نظام تواصل داخل تطبيق أكبر.';
+      if (isFr) return 'Chatify est une app de messagerie temps réel avec :\n• Conversations privées et de groupe\n• Présence (en ligne / hors ligne)\n• Accusés de lecture\n• Expérience fluide en temps réel\nIdéal comme base pour tout système de communication dans une app plus large.';
+      return 'Chatify is a real-time messaging app featuring:\n• Private and group conversations\n• Presence (online/offline)\n• Read receipts\n• Smooth real-time experience\nGreat as a foundation for any in-app communication system.';
+    }
+
+    /* ---------- Tech stack ---------- */
+    if (match(
+      /tech|stack|technologie|technologies|تقنية|تقنيات|لغات|tools|framework|outils|outils techniques|what do you use|بماذا تعمل|quelles technos/
+    )) {
+      if (isAr) return 'التقنيات الأساسية التي أستخدمها:\n• Mobile: Flutter / Dart\n• Backend & Web: JavaScript, Node.js, PHP, React, Vue\n• Backend-as-a-Service: Firebase\n• قواعد بيانات: MySQL, PostgreSQL, MongoDB\n• أخرى: Docker, Git, CI/CD\nأختار الأداة حسب احتياج المشروع وليس العكس. هل لديك تقنية مفضلة؟';
+      if (isFr) return 'Stack principale :\n• Mobile : Flutter / Dart\n• Backend & Web : JavaScript, Node.js, PHP, React, Vue\n• BaaS : Firebase\n• Bases de données : MySQL, PostgreSQL, MongoDB\n• Autres : Docker, Git, CI/CD\nJe choisis la techno selon le besoin du projet. Avez-vous une préférence ?';
+      return 'Core stack:\n• Mobile: Flutter / Dart\n• Backend & Web: JavaScript, Node.js, PHP, React, Vue\n• BaaS: Firebase\n• Databases: MySQL, PostgreSQL, MongoDB\n• Others: Docker, Git, CI/CD\nI pick the tech based on product needs — not the other way around. Any preferred technology?';
+    }
+
+    /* ---------- Contact / reach ---------- */
+    if (match(
+      /contact|تواصل|اتصل|whatsapp|واتساب|email|mail|بريد|joindre|رقم|phone|téléphone|appeler|reach you|how to reach|كيف أتواصل|كيف اتواصل/
+    )) {
+      if (isAr) return 'يمكنك التواصل معي بسهولة عبر:\n• واتساب: الزر الموجود في أعلى الموقع\n• البريد الإلكتروني من قسم Contact أو التذييل\n• أو اترك رسالة عبر نموذج التواصل إن وُجد\nأرد عادة بسرعة. أنا متاح لمشاريع جديدة.';
+      if (isFr) return 'Vous pouvez me joindre facilement via :\n• WhatsApp (bouton en haut du site)\n• Email dans la section Contact ou le pied de page\n• Ou le formulaire de contact s’il est disponible\nJe réponds généralement rapidement. Disponible pour de nouveaux projets.';
+      return 'You can reach me easily via:\n• WhatsApp (button in the top navigation)\n• Email in the Contact section or footer\n• Or the contact form if available on the site\nI usually reply quickly. Currently available for new work.';
+    }
+
+    /* ---------- Availability / Hire / Pricing ---------- */
+    if (match(
+      /available|availability|hire|hiring|work with|collaborate|متاح|متوفر|وظف|توظيف|تعاون|collabor|disponible|travailler avec|prix|price|cost|سعر|budget|devis|estimation|estimate|كم يكلف|how much/
+    )) {
+      if (isAr) return 'نعم، أنا متاح حالياً لمشاريع جديدة.\nالتكلفة تعتمد على:\n• نطاق المشروع (features)\n• المدة الزمنية\n• التقنيات والمنصات\nصف لي فكرتك باختصار (حتى في رسالة واحدة) وسأعطيك تقديراً أولياً أو نحدد مكالمة قصيرة.';
+      if (isFr) return 'Oui, je suis disponible pour de nouveaux projets.\nLe budget dépend de :\n• La portée (fonctionnalités)\n• Le délai\n• Les technologies et plateformes\nDécrivez brièvement votre idée (même en un message) et je pourrai vous donner une estimation ou planifier un court appel.';
+      return 'Yes — I’m currently available for new projects.\nPricing depends on:\n• Scope (features)\n• Timeline\n• Technologies & platforms\nShare a short description of your idea (even one message) and I can give a rough estimate or set up a short call.';
+    }
+
+    /* ---------- Process / How we work ---------- */
+    if (match(
+      /process|processus|كيف تعمل|كيف نبدأ|how do you work|how we start|workflow|مراحل|étapes|méthode|method/
+    )) {
+      if (isAr) return 'طريقة العمل عادة تكون كالتالي:\n1. نفهم الفكرة والمتطلبات\n2. أقترح الحل التقني والتقدير\n3. نبدأ بمرحلة تصميم/نموذج أولي إن لزم\n4. تطوير على مراحل مع تحديثات مستمرة\n5. اختبار + نشر (Stores أو سيرفر)\n6. دعم وصيانة بعد الإطلاق\nكل شيء شفاف ويمكن تعديله حسب المشروع.';
+      if (isFr) return 'Le process habituel :\n1. Comprendre l’idée et les besoins\n2. Proposition technique + estimation\n3. Design / proto si besoin\n4. Développement itératif avec mises à jour régulières\n5. Tests + mise en production (stores ou serveur)\n6. Support & maintenance après lancement\nTout est transparent et adaptable au projet.';
+      return 'Typical process:\n1. Understand the idea & requirements\n2. Technical proposal + estimate\n3. Design / prototype if needed\n4. Iterative development with regular updates\n5. Testing + launch (stores or server)\n6. Support & maintenance after launch\nEverything is transparent and can be adapted to the project.';
+    }
+
+    /* ---------- Location / Language ---------- */
+    if (match(
+      /where|location|city|country|أين|وين|مدينة|جزائر|الجزائر|algeria|biskra|بسكرة|langue|language|لغة|speak|parlez|عربي|فرنسي|anglais/
+    )) {
+      if (isAr) return 'أنا من الجزائر (منطقة بسكرة)، وأعمل مع عملاء محليين ودوليين عن بُعد.\nأتحدث العربية والفرنسية والإنجليزية، لذا التواصل سهل بأي من هذه اللغات.';
+      if (isFr) return 'Je suis basé en Algérie (région de Biskra) et je travaille avec des clients locaux et internationaux à distance.\nJe parle arabe, français et anglais — la communication est fluide dans ces trois langues.';
+      return 'I’m based in Algeria (Biskra region) and work with local and international clients remotely.\nI speak Arabic, French and English — so communication is easy in any of these languages.';
+    }
+
+    /* ---------- Experience / Years ---------- */
+    if (match(
+      /experience|expérience|سنوات|years|كم سنة|depuis quand|how long|خبرة/
+    )) {
+      if (isAr) return 'لدي خبرة عملية في بناء منتجات حقيقية (موبايل + ويب + أنظمة حية)، من الفكرة حتى الإطلاق والنشر على المتاجر.\nأعمل على مشاريع متكاملة وليس مجرد أجزاء صغيرة، وهذا ما يظهر في أعمالي مثل Cisterna.';
+      if (isFr) return 'J’ai une expérience concrète dans la construction de produits réels (mobile + web + systèmes live), de l’idée jusqu’au lancement et à la publication sur les stores.\nJe travaille sur des projets complets, comme le montre Cisterna.';
+      return 'I have hands-on experience building real products (mobile + web + live systems) from idea to launch and store publishing.\nI work on complete products, not just small pieces — as shown by projects like Cisterna.';
+    }
+
+    /* ---------- CV / Resume / Portfolio ---------- */
+    if (match(
+      /cv|resume|curriculum|سيرة|تحميل|download|portfolio|ملف/
+    )) {
+      if (isAr) return 'يمكنك تحميل الـ CV من الزر الموجود في قسم الـ Hero أعلى الصفحة.\nكما أن هذا الموقع نفسه هو الـ Portfolio الخاص بي — كل المشاريع والخدمات موضحة هنا.';
+      if (isFr) return 'Vous pouvez télécharger mon CV via le bouton dans la section Hero en haut de la page.\nCe site est également mon portfolio — tous les projets et services y sont présentés.';
+      return 'You can download my CV from the button in the Hero section at the top of the page.\nThis website itself is my portfolio — all projects and services are presented here.';
+    }
+
+    /* ---------- Social / GitHub / LinkedIn ---------- */
+    if (match(
+      /github|git hub|linkedin|social|شبكات|حسابات|روابط|links|follow/
+    )) {
+      if (isAr) return 'روابط التواصل والحسابات موجودة في تذييل الموقع (Footer) وأيضاً في قسم Contact.\nيمكنك العثور على GitHub وLinkedIn وبقية الروابط هناك.';
+      if (isFr) return 'Les liens sociaux et comptes se trouvent dans le pied de page (Footer) ainsi que dans la section Contact.\nGitHub, LinkedIn et les autres liens y sont disponibles.';
+      return 'Social links and accounts are in the site footer and in the Contact section.\nYou’ll find GitHub, LinkedIn and other links there.';
+    }
+
+    /* ---------- Future / What’s next / Roadmap ---------- */
+    if (match(
+      /future|قادم|مستقبل|قريبا|soon|roadmap|ماذا بعد|what's next|nouveautés|جديد|upcoming/
+    )) {
+      if (isAr) return 'أعمل باستمرار على تحسين المنتجات الحالية وإضافة ميزات جديدة، وأستقبل أفكار مشاريع جديدة.\nإذا كان لديك فكرة أو ميزة تريد إضافتها لمشروع، أخبرني وسنرى كيف ننفذها.';
+      if (isFr) return 'Je travaille en continu à améliorer les produits existants et à ajouter de nouvelles fonctionnalités, et je reste ouvert aux nouvelles idées de projets.\nSi vous avez une idée ou une feature à ajouter, parlez-m’en.';
+      return 'I continuously improve existing products and add new features, and I’m open to new project ideas.\nIf you have an idea or a feature you’d like to add, tell me and we’ll see how to build it.';
+    }
+
+    /* ---------- Thanks / Bye ---------- */
+    if (match(/thank|merci|شكرا|thanks|thx|شكراً|متشكر|grateful/)) {
+      if (isAr) return 'العفو! إذا احتجت أي شيء آخر — عن المشاريع أو الخدمات أو كيف نبدأ — أنا هنا.';
+      if (isFr) return 'Avec plaisir ! N’hésitez pas si vous avez d’autres questions sur les projets, les services ou comment démarrer.';
+      return 'You’re welcome! Happy to help with anything else — projects, services, or how to get started.';
+    }
+    if (match(/bye|goodbye|مع السلامة|إلى اللقاء|au revoir|à bientôt|سلام|bye bye/)) {
+      if (isAr) return 'إلى اللقاء! لا تتردد في العودة متى شئت. بالتوفيق.';
+      if (isFr) return 'À bientôt ! N’hésitez pas à revenir quand vous voulez. Bonne continuation.';
+      return 'Goodbye! Feel free to come back anytime. All the best.';
+    }
+
+    /* ---------- Fallback — still helpful ---------- */
+    return t('fallback', lang);
+  }
+
+  let hasGreeted = false;
+
+  function openChat() {
+    widget.classList.add('is-open');
+    panel.setAttribute('aria-hidden', 'false');
+    const lang = siteLang();
+    updateChrome(lang);
+    if (!hasGreeted) {
+      messagesEl.innerHTML = '';
+      appendMsg('bot', t('greeting', lang), lang);
+      renderSuggestions(lang);
+      hasGreeted = true;
+    }
+    setTimeout(() => input?.focus(), 280);
+  }
+
+  function closeChat() {
+    widget.classList.remove('is-open');
+    panel.setAttribute('aria-hidden', 'true');
+  }
+
+  fab.addEventListener('click', () => {
+    if (widget.classList.contains('is-open')) closeChat();
+    else openChat();
+  });
+  closeBtn?.addEventListener('click', closeChat);
+
+  clearBtn?.addEventListener('click', () => {
+    const lang = siteLang();
+    messagesEl.innerHTML = '';
+    appendMsg('bot', t('cleared', lang), lang);
+    renderSuggestions(lang);
+    hasGreeted = true;
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && widget.classList.contains('is-open')) closeChat();
+  });
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = (input.value || '').trim();
+    if (!text) return;
+    const lang = detectLang(text);
+    appendMsg('user', text, lang);
+    input.value = '';
+    suggestionsEl.innerHTML = '';
+    sendBtn.disabled = true;
+    showTyping();
+
+    // Simulate thinking delay for a natural feel
+    const delay = 600 + Math.min(1200, text.length * 18);
+    setTimeout(() => {
+      hideTyping();
+      const answer = replyFor(text, lang);
+      appendMsg('bot', answer, lang);
+      renderSuggestions(lang);
+      sendBtn.disabled = false;
+      input.focus();
+    }, delay);
+  });
+
+  // Instant language switch for the AI chat (no page reload needed)
+  function syncChatLanguage(lang) {
+    lang = chatI18n[lang] ? lang : siteLang();
+    updateChrome(lang);
+
+    // Update assistant display name if remote settings exist
+    const nameEl = panel.querySelector('.ai-chat-name');
+    if (nameEl && remoteSettings && remoteSettings.assistant_name) {
+      nameEl.textContent = pickI18nLocal(remoteSettings.assistant_name, lang);
+    } else if (nameEl) {
+      // keep existing static name if no remote config
+    }
+
+    if (widget.classList.contains('is-open')) {
+      // Chat is open → clear and re-greet in the new language immediately
+      messagesEl.innerHTML = '';
+      appendMsg('bot', t('greeting', lang), lang);
+      renderSuggestions(lang);
+      hasGreeted = true;
+    } else {
+      // Chat closed → next open will greet in the new language
+      hasGreeted = false;
+    }
+  }
+
+  document.addEventListener('site-lang-changed', (e) => {
+    const lang = (e.detail && e.detail.lang) || siteLang();
+    syncChatLanguage(lang);
+  });
+
+  // Initial chrome
+  updateChrome(siteLang());
+  } // end boot
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();

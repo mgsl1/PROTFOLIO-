@@ -285,6 +285,60 @@
   <p class="footer-copy">© <span id="year"></span> Mohamed Abdo — <span data-i18n="footer.copy">Built from scratch, no templates.</span></p>
 </footer>
 
+<!-- AI CHAT WIDGET -->
+<div class="ai-chat-widget" id="aiChatWidget">
+  <button class="ai-fab" id="aiFab" aria-label="Open AI chat" title="Chat with Mohamed Abdo AI">
+    <span class="ai-fab-ring ai-fab-ring-1"></span>
+    <span class="ai-fab-ring ai-fab-ring-2"></span>
+    <span class="ai-fab-ring ai-fab-ring-3"></span>
+
+    <!-- Professional thought-bubble with avatar -->
+    <span class="ai-fab-bubble">
+      <span class="ai-fab-avatar">
+        <img src="assets/avatar.jpg" alt="Mohamed Abdo" onerror="this.style.display='none'">
+      </span>
+      <span class="ai-fab-badge" aria-hidden="true">AI</span>
+      <!-- small trailing thought dots -->
+      <span class="ai-fab-dot ai-fab-dot-1"></span>
+      <span class="ai-fab-dot ai-fab-dot-2"></span>
+    </span>
+  </button>
+
+  <div class="ai-chat-panel" id="aiChatPanel" role="dialog" aria-label="AI Chat" aria-hidden="true">
+    <div class="ai-chat-header">
+      <div class="ai-chat-header-left">
+        <div class="ai-avatar">
+          <img src="assets/avatar.jpg" alt="Mohamed Abdo" onerror="this.style.display='none'">
+          <span class="ai-online"></span>
+        </div>
+        <div class="ai-chat-titles">
+          <strong class="ai-chat-name">Mohamed Abdo</strong>
+          <span class="ai-chat-status" data-i18n-chat="status">Online · AI Assistant</span>
+        </div>
+      </div>
+      <div class="ai-chat-header-actions">
+        <button type="button" class="ai-chat-btn" id="aiChatClear" title="Clear chat" aria-label="Clear chat">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+        </button>
+        <button type="button" class="ai-chat-btn" id="aiChatClose" title="Close" aria-label="Close chat">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="ai-chat-messages" id="aiChatMessages" aria-live="polite"></div>
+
+    <div class="ai-chat-suggestions" id="aiChatSuggestions"></div>
+
+    <form class="ai-chat-input-row" id="aiChatForm" autocomplete="off">
+      <input type="text" id="aiChatInput" placeholder="Ask me anything..." data-i18n-chat-ph="placeholder" maxlength="500" aria-label="Message">
+      <button type="submit" class="ai-chat-send" id="aiChatSend" aria-label="Send">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      </button>
+    </form>
+  </div>
+</div>
+
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="script.js"></script>
