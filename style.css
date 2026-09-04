@@ -99,6 +99,23 @@ h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; letter-spacing:-0.
 .logo:hover{ transform:translateY(-1px); }
 .logo:hover .logo-img{ filter:drop-shadow(0 0 10px #e0a52655); }
 .nav-right{display:flex; align-items:center; gap:14px;}
+
+/* WhatsApp icon in header */
+.nav-whatsapp{
+  display:flex; align-items:center; justify-content:center;
+  width:42px; height:42px; border-radius:50%; flex:none;
+  background:#25D36618; border:1px solid #25D36644;
+  transition:background .25s ease, border-color .25s ease, transform .2s ease, box-shadow .25s ease;
+}
+.nav-whatsapp:hover{
+  background:#25D36630; border-color:#25D36688;
+  transform:translateY(-1px);
+  box-shadow:0 4px 14px #25D36633;
+}
+.nav-whatsapp:active{ transform:scale(.92); }
+.nav-whatsapp .social-icon{ width:20px; height:20px; }
+.nav-whatsapp .social-icon svg{ width:100%; height:100%; }
+
 .nav-links{display:flex; gap:30px; font-size:.92rem; color:var(--text-dim);}
 .nav-links a{transition:color .2s;}
 .nav-links a:hover, .nav-links a.active{color:var(--text);}

@@ -103,6 +103,73 @@ function paintStatistics() {
     .join("");
 }
 
+
+/* ============================================================
+   SERVICE ICONS (inline SVG, gold-friendly stroke icons)
+============================================================ */
+const serviceIcons = {
+  mobile: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>`,
+  web: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+  backend: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>`,
+  api: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
+  database: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>`,
+  realtime: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
+  dashboard: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>`,
+  devops: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/></svg>`,
+  // common aliases
+  "mobile-app": null, "mobile-development": null, "app": null,
+  "web-development": null, "website": null,
+  "backend-development": null, "server": null,
+  "api-integration": null, "integration": null,
+  "database-design": null, "db": null,
+  "real-time": null, "realtime-features": null,
+  "admin-dashboard": null, "analytics": null, "tableaux": null,
+  "deployment": null, "maintenance": null, "devops-maintenance": null,
+};
+// resolve aliases
+serviceIcons["mobile-app"] = serviceIcons.mobile;
+serviceIcons["mobile-development"] = serviceIcons.mobile;
+serviceIcons["app"] = serviceIcons.mobile;
+serviceIcons["web-development"] = serviceIcons.web;
+serviceIcons["website"] = serviceIcons.web;
+serviceIcons["backend-development"] = serviceIcons.backend;
+serviceIcons["server"] = serviceIcons.backend;
+serviceIcons["api-integration"] = serviceIcons.api;
+serviceIcons["integration"] = serviceIcons.api;
+serviceIcons["database-design"] = serviceIcons.database;
+serviceIcons["db"] = serviceIcons.database;
+serviceIcons["real-time"] = serviceIcons.realtime;
+serviceIcons["realtime-features"] = serviceIcons.realtime;
+serviceIcons["admin-dashboard"] = serviceIcons.dashboard;
+serviceIcons["analytics"] = serviceIcons.dashboard;
+serviceIcons["tableaux"] = serviceIcons.dashboard;
+serviceIcons["deployment"] = serviceIcons.devops;
+serviceIcons["maintenance"] = serviceIcons.devops;
+serviceIcons["devops-maintenance"] = serviceIcons.devops;
+
+function resolveServiceIcon(r) {
+  // 1) uploaded image
+  if (r.icon_url) {
+    return `<img src="${escHtml(r.icon_url)}" alt="" style="width:18px;height:18px;object-fit:contain;">`;
+  }
+  // 2) explicit icon key from dashboard
+  const key = (r.icon || r.slug || "").toLowerCase().trim().replace(/\s+/g, "-");
+  if (key && serviceIcons[key]) return serviceIcons[key];
+  // 3) fuzzy match from title (en/fr/ar keywords)
+  const title = (typeof pickI18n === "function" ? pickI18n(r.title) : "") || "";
+  const t = title.toLowerCase();
+  if (/mobile|flutter|android|ios|تطبيق|mobile|application mobile/.test(t)) return serviceIcons.mobile;
+  if (/web|site|react|next/.test(t)) return serviceIcons.web;
+  if (/backend|serveur|server|api backend|نظام/.test(t)) return serviceIcons.backend;
+  if (/api|intégration|integration|rest/.test(t)) return serviceIcons.api;
+  if (/base de données|database|postgres|mysql|mongo|firebase|بيانات/.test(t)) return serviceIcons.database;
+  if (/temps réel|real.?time|realtime|مباشر|chat|notification/.test(t)) return serviceIcons.realtime;
+  if (/tableau|dashboard|analytics|bord|إحصائ|لوحة/.test(t)) return serviceIcons.dashboard;
+  if (/déploiement|deploy|devops|maintenance|صيانة/.test(t)) return serviceIcons.devops;
+  // fallback: layers icon
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 8 12 14 22 8 12 2"/><polyline points="2 16 12 22 22 16"/></svg>`;
+}
+
 /* ============================================================
    SERVICES
 ============================================================ */
@@ -115,7 +182,7 @@ function paintServices() {
     .filter((r) => r.is_visible !== false)
     .map((r) => `
       <div class="service-card">
-        <span class="service-icon">${r.icon_url ? `<img src="${escHtml(r.icon_url)}" alt="" style="width:18px;height:18px;">` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"></rect></svg>`}</span>
+        <span class="service-icon">${resolveServiceIcon(r)}</span>
         <h4>${escHtml(pickI18n(r.title))}</h4>
         <p>${escHtml(pickI18n(r.short_description))}</p>
       </div>
@@ -691,9 +758,10 @@ function paintSocialLinks() {
   if (!rows || !rows.length) return;
   rows.forEach((r) => {
     const platform = (r.platform || "").toLowerCase();
-    const el = document.querySelector(`[data-social="${platform}"]`);
-    const anchor = el ? el.closest("a") : null;
-    if (anchor && r.url) anchor.href = r.url;
+    document.querySelectorAll(`[data-social="${platform}"]`).forEach((el) => {
+      const anchor = el.closest("a");
+      if (anchor && r.url) anchor.href = r.url;
+    });
   });
 }
 
