@@ -753,6 +753,14 @@ function paintContactInfo() {
   if (row.email) {
     document.querySelectorAll("a[href^='mailto:']").forEach((a) => { a.href = `mailto:${row.email}`; });
   }
+  // Sync WhatsApp links (nav / footer) from contact_info.whatsapp
+  const phone = resolveWhatsAppNumber();
+  if (phone) {
+    document.querySelectorAll("a.nav-whatsapp, a[href*='wa.me'], [data-social='whatsapp']").forEach((el) => {
+      const a = el.tagName === "A" ? el : el.closest("a");
+      if (a) a.href = `https://wa.me/${phone}`;
+    });
+  }
 }
 function paintSocialLinks() {
   const rows = DYN.socialLinks;
@@ -772,28 +780,39 @@ function paintSocialLinks() {
 ============================================================ */
 const contactFormI18n = {
   name:       { en: "Your name",                    fr: "Votre nom",                          ar: "الاسم الكامل" },
-  email:      { en: "Your email",                   fr: "Votre e-mail",                       ar: "البريد الإلكتروني" },
+  email:      { en: "Your email (optional)",        fr: "Votre e-mail (optionnel)",           ar: "البريد الإلكتروني (اختياري)" },
+  whatsapp:   { en: "WhatsApp (optional)",          fr: "WhatsApp (optionnel)",               ar: "واتساب (اختياري)" },
+  contactHint:{ en: "Leave at least email or WhatsApp so I can reply.", fr: "Laissez au moins un e-mail ou WhatsApp pour que je puisse répondre.", ar: "اترك على الأقل إيميل أو واتساب حتى أتمكن من الرد." },
   subject:    { en: "Subject",                      fr: "Sujet",                              ar: "الموضوع" },
   message:    { en: "Tell me about your project…",  fr: "Parlez-moi de votre projet…",        ar: "أخبرني عن مشروعك…" },
   send:       { en: "Send Message",                 fr: "Envoyer le message",                 ar: "إرسال الرسالة" },
   sending:    { en: "Sending…",                     fr: "Envoi en cours…",                    ar: "جارٍ الإرسال…" },
-  success:    { en: "Thanks! I'll get back to you soon.", fr: "Merci ! Je vous répondrai bientôt.", ar: "شكرًا لك! سأرد عليك قريبًا." },
+  success:    {
+    en: "Thank you! Your message was sent successfully. I'll get back to you soon.",
+    fr: "Merci ! Votre message a été envoyé avec succès. Je vous répondrai bientôt.",
+    ar: "شكراً لك! تم إرسال رسالتك بنجاح. سأرد عليك قريباً.",
+  },
+  needContact:{ en: "Please enter email or WhatsApp (at least one).", fr: "Veuillez saisir un e-mail ou WhatsApp (au moins un).", ar: "يرجى إدخال إيميل أو واتساب (واحد على الأقل)." },
   error:      { en: "Couldn't send — please try again later.", fr: "Échec de l'envoi — réessayez plus tard.", ar: "تعذّر الإرسال — حاول لاحقًا." },
 };
 
 function updateContactFormLanguage() {
   const form = document.getElementById("contactForm");
   if (!form) return;
-  const nameInput    = form.querySelector('input[name="name"]');
-  const emailInput   = form.querySelector('input[name="email"]');
-  const subjectInput = form.querySelector('input[name="subject"]');
-  const messageArea  = form.querySelector('textarea[name="message"]');
-  const sendBtnSpan  = form.querySelector('button[type="submit"] span');
-  if (nameInput)    nameInput.placeholder    = pickI18n(contactFormI18n.name);
-  if (emailInput)   emailInput.placeholder   = pickI18n(contactFormI18n.email);
-  if (subjectInput) subjectInput.placeholder = pickI18n(contactFormI18n.subject);
-  if (messageArea)  messageArea.placeholder  = pickI18n(contactFormI18n.message);
-  if (sendBtnSpan)  sendBtnSpan.textContent  = pickI18n(contactFormI18n.send);
+  const nameInput      = form.querySelector('input[name="name"]');
+  const emailInput     = form.querySelector('input[name="email"]');
+  const whatsappInput  = form.querySelector('input[name="whatsapp"]');
+  const subjectInput   = form.querySelector('input[name="subject"]');
+  const messageArea    = form.querySelector('textarea[name="message"]');
+  const sendBtnSpan    = form.querySelector('button[type="submit"] span');
+  const hintEl         = form.querySelector(".contact-hint");
+  if (nameInput)     nameInput.placeholder     = pickI18n(contactFormI18n.name);
+  if (emailInput)    emailInput.placeholder    = pickI18n(contactFormI18n.email);
+  if (whatsappInput) whatsappInput.placeholder = pickI18n(contactFormI18n.whatsapp);
+  if (subjectInput)  subjectInput.placeholder  = pickI18n(contactFormI18n.subject);
+  if (messageArea)   messageArea.placeholder   = pickI18n(contactFormI18n.message);
+  if (sendBtnSpan)   sendBtnSpan.textContent   = pickI18n(contactFormI18n.send);
+  if (hintEl)        hintEl.textContent        = pickI18n(contactFormI18n.contactHint);
 }
 
 function buildContactForm() {
@@ -805,12 +824,15 @@ function buildContactForm() {
   wrap.style.cssText = "padding-top:10px; padding-bottom:50px;";
   wrap.innerHTML = `
     <form id="contactForm" style="max-width:640px; margin:0 auto; display:grid; gap:14px;">
+      <input required name="name" type="text" placeholder="${pickI18n(contactFormI18n.name)}"
+        style="background:#ffffff08; border:1px solid var(--border); color:var(--text); padding:12px 14px; border-radius:10px; font-family:var(--font-body);">
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
-        <input required name="name" type="text" placeholder="${pickI18n(contactFormI18n.name)}"
+        <input name="email" type="email" placeholder="${pickI18n(contactFormI18n.email)}"
           style="background:#ffffff08; border:1px solid var(--border); color:var(--text); padding:12px 14px; border-radius:10px; font-family:var(--font-body);">
-        <input required name="email" type="email" placeholder="${pickI18n(contactFormI18n.email)}"
+        <input name="whatsapp" type="tel" inputmode="tel" placeholder="${pickI18n(contactFormI18n.whatsapp)}"
           style="background:#ffffff08; border:1px solid var(--border); color:var(--text); padding:12px 14px; border-radius:10px; font-family:var(--font-body);">
       </div>
+      <p class="contact-hint" style="font-size:.8rem; color:var(--text-dim); margin:-6px 0 0;">${pickI18n(contactFormI18n.contactHint)}</p>
       <input name="subject" type="text" placeholder="${pickI18n(contactFormI18n.subject)}"
         style="background:#ffffff08; border:1px solid var(--border); color:var(--text); padding:12px 14px; border-radius:10px; font-family:var(--font-body);">
       <textarea required name="message" rows="5" placeholder="${pickI18n(contactFormI18n.message)}"
@@ -830,23 +852,182 @@ function buildContactForm() {
     const statusEl = document.getElementById("contactFormStatus");
     const btn = form.querySelector("button[type='submit']");
     const data = Object.fromEntries(new FormData(form).entries());
+    const email = (data.email || "").trim();
+    const whatsapp = (data.whatsapp || "").trim();
+
+    if (!email && !whatsapp) {
+      statusEl.style.color = "#e74c3c";
+      statusEl.textContent = pickI18n(contactFormI18n.needContact);
+      return;
+    }
+
     btn.disabled = true;
+    statusEl.style.color = "";
     statusEl.textContent = pickI18n(contactFormI18n.sending);
     try {
+      // email column stores email if present, otherwise visitor WhatsApp so admin always has a contact
+      const contactChannel = email || whatsapp;
+      const messageBody = [
+        data.message,
+        whatsapp && email ? `\n\n—\nWhatsApp: ${whatsapp}` : (whatsapp && !email ? "" : ""),
+        email && whatsapp ? `\nEmail: ${email}` : "",
+      ].join("").trim();
+
       const { error } = await sbClient.from("contact_messages").insert({
-        name: data.name, email: data.email, subject: data.subject || null,
-        message: data.message, language: currentLang(), status: "new",
+        name: data.name,
+        email: contactChannel,
+        subject: data.subject || null,
+        message: whatsapp && email
+          ? `${data.message}\n\n—\nEmail: ${email}\nWhatsApp: ${whatsapp}`
+          : data.message,
+        language: currentLang(),
+        status: "new",
       });
       if (error) throw error;
-      statusEl.textContent = pickI18n(contactFormI18n.success);
+
+      await notifyOwnerWhatsApp({
+        name: data.name,
+        email,
+        whatsapp,
+        subject: data.subject,
+        message: data.message,
+      });
+
+      statusEl.textContent = "";
       form.reset();
+      showContactSuccessModal();
     } catch (err) {
+      statusEl.style.color = "#e74c3c";
       statusEl.textContent = pickI18n(contactFormI18n.error);
       console.error(err);
     } finally {
       btn.disabled = false;
     }
   });
+}
+
+/** Green success popup with checkmark */
+function showContactSuccessModal() {
+  document.getElementById("contactSuccessModal")?.remove();
+  const msg = pickI18n(contactFormI18n.success);
+  const overlay = document.createElement("div");
+  overlay.id = "contactSuccessModal";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.style.cssText = [
+    "position:fixed", "inset:0", "z-index:99999",
+    "display:flex", "align-items:center", "justify-content:center",
+    "background:rgba(0,0,0,.55)", "backdrop-filter:blur(6px)",
+    "padding:20px", "opacity:0", "transition:opacity .25s ease",
+  ].join(";");
+  overlay.innerHTML = `
+    <div style="
+      background:var(--card, #14141f); border:1px solid #ffffff18; border-radius:20px;
+      padding:32px 28px 26px; max-width:380px; width:100%; text-align:center;
+      box-shadow:0 24px 60px -20px rgba(0,0,0,.6); transform:scale(.92);
+      transition:transform .28s cubic-bezier(.2,.9,.3,1);
+    " id="contactSuccessCard">
+      <div style="
+        width:72px; height:72px; margin:0 auto 18px; border-radius:50%;
+        background:linear-gradient(145deg,#1dbf7318,#1dbf7308);
+        border:2px solid #1dbf7366; display:grid; place-items:center;
+      ">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6 9 17l-5-5"/>
+        </svg>
+      </div>
+      <p style="margin:0 0 8px; font-size:1.15rem; font-weight:600; color:var(--text, #fff);">${msg.split("!")[0] ? msg.split("!")[0] + "!" : "✓"}</p>
+      <p style="margin:0 0 22px; font-size:.92rem; line-height:1.55; color:var(--text-dim, #aaa);">${msg.includes("!") ? msg.slice(msg.indexOf("!") + 1).trim() : msg}</p>
+      <button type="button" class="btn btn-primary" id="contactSuccessOk" style="min-width:120px;">OK</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => {
+    overlay.style.opacity = "1";
+    const card = document.getElementById("contactSuccessCard");
+    if (card) card.style.transform = "scale(1)";
+  });
+  const close = () => {
+    overlay.style.opacity = "0";
+    setTimeout(() => overlay.remove(), 250);
+  };
+  overlay.querySelector("#contactSuccessOk")?.addEventListener("click", close);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+  document.addEventListener("keydown", function esc(e) {
+    if (e.key === "Escape") { close(); document.removeEventListener("keydown", esc); }
+  });
+}
+
+/** Resolve owner WhatsApp number from backend (contact_info.whatsapp). */
+function resolveWhatsAppNumber() {
+  const info = DYN.contactInfo || {};
+  let raw = info.whatsapp || info.phone || "";
+  if (!raw && Array.isArray(DYN.socialLinks)) {
+    const wa = DYN.socialLinks.find((r) => String(r.platform || "").toLowerCase() === "whatsapp");
+    if (wa && wa.url) raw = wa.url;
+  }
+  const fromUrl = String(raw).match(/(?:wa\.me\/|whatsapp\.com\/send\?phone=)(\d+)/i);
+  if (fromUrl) return fromUrl[1];
+  const digits = String(raw).replace(/[^\d]/g, "");
+  return digits || "";
+}
+
+/**
+ * Send a standalone WhatsApp notification to the site owner via CallMeBot.
+ * Does NOT open the visitor's WhatsApp — you receive one message with full details.
+ * Requires WHATSAPP_CALLMEBOT_APIKEY in config.js (free setup, ~1 minute).
+ */
+async function notifyOwnerWhatsApp(data) {
+  const phone = resolveWhatsAppNumber();
+  const apikey = (typeof WHATSAPP_CALLMEBOT_APIKEY !== "undefined" && WHATSAPP_CALLMEBOT_APIKEY)
+    ? String(WHATSAPP_CALLMEBOT_APIKEY).trim()
+    : "";
+
+  const name = (data.name || "").trim();
+  const visitorWa = (data.whatsapp || "").trim();
+  const visitorEmail = (data.email || "").trim();
+  const subject = (data.subject || "").trim();
+  const message = (data.message || "").trim();
+
+  const text = [
+    "📩 رسالة جديدة من الموقع",
+    name ? `الاسم: ${name}` : "",
+    visitorEmail ? `الإيميل: ${visitorEmail}` : "",
+    visitorWa ? `واتساب الزائر: ${visitorWa}` : "",
+    subject ? `الموضوع: ${subject}` : "",
+    message ? `الرسالة:\n${message}` : "",
+  ].filter(Boolean).join("\n");
+
+  if (!phone) {
+    console.warn("[Contact] No owner WhatsApp in contact_info");
+    return;
+  }
+  if (!apikey) {
+    console.warn("[Contact] WHATSAPP_CALLMEBOT_APIKEY is empty — message saved in dashboard only. Set the key in config.js for WhatsApp notify.");
+    return;
+  }
+
+  const url = "https://api.callmebot.com/whatsapp.php"
+    + "?phone=" + encodeURIComponent(phone)
+    + "&text=" + encodeURIComponent(text)
+    + "&apikey=" + encodeURIComponent(apikey);
+
+  try {
+    // no-cors: CallMeBot may not send CORS headers; request still reaches their server
+    await fetch(url, { method: "GET", mode: "no-cors" });
+  } catch (err) {
+    // Fallback: image ping (also works without CORS)
+    try {
+      await new Promise((resolve) => {
+        const img = new Image();
+        img.onload = img.onerror = resolve;
+        img.src = url + "&_=" + Date.now();
+        setTimeout(resolve, 2500);
+      });
+    } catch (_) {
+      console.warn("[Contact] WhatsApp notify failed", err);
+    }
+  }
 }
 
 /* ============================================================
@@ -976,6 +1157,11 @@ async function initBackend() {
   paintContactInfo();
   paintSocialLinks();
   applySeoMeta();
+
+  // Notify AI chat (and others) that dynamic data is ready
+  document.dispatchEvent(new CustomEvent("portfolio-data-loaded", {
+    detail: { projects: projects || [], services: services || [] }
+  }));
 
   // Record a site visit (once per visitor per day)
   trackSiteVisit();

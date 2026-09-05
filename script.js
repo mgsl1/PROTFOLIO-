@@ -60,8 +60,25 @@ const translations = {
     "nav.about": "About",
     "nav.projects": "Projects",
     "nav.services": "Services",
+    "nav.process": "Process",
     "nav.contact": "Contact",
     "nav.cta": "Let's Talk",
+    "process.eyebrow": "How I Work",
+    "process.heading.line1": "A clear path",
+    "process.heading.line2": "from idea to launch",
+    "process.lead": "Five simple steps — ask the AI assistant for the full explanation of each one.",
+    "process.step1.title": "Contact",
+    "process.step1.hint": "Start the conversation",
+    "process.step2.title": "Quote",
+    "process.step2.hint": "Scope & pricing",
+    "process.step3.title": "Development",
+    "process.step3.hint": "Build & iterate",
+    "process.step4.title": "Delivery",
+    "process.step4.hint": "Launch ready",
+    "process.step5.title": "Support",
+    "process.step5.hint": "Ongoing care",
+    "process.cta.text": "Want the full explanation of every step?",
+    "process.cta.btn": "Ask the AI assistant",
     "hero.available": "Available for work",
     "hero.title.line1": "I Build Digital",
     "hero.title.line2": "Experiences",
@@ -127,8 +144,25 @@ const translations = {
     "nav.about": "À propos",
     "nav.projects": "Projets",
     "nav.services": "Services",
+    "nav.process": "Processus",
     "nav.contact": "Contact",
     "nav.cta": "Discutons",
+    "process.eyebrow": "Comment je travaille",
+    "process.heading.line1": "Un chemin clair",
+    "process.heading.line2": "de l'idée au lancement",
+    "process.lead": "Cinq étapes simples — demandez à l'assistant IA l'explication complète de chacune.",
+    "process.step1.title": "Contact",
+    "process.step1.hint": "Démarrer la discussion",
+    "process.step2.title": "Devis",
+    "process.step2.hint": "Périmètre & budget",
+    "process.step3.title": "Développement",
+    "process.step3.hint": "Construire & itérer",
+    "process.step4.title": "Livraison",
+    "process.step4.hint": "Prêt au lancement",
+    "process.step5.title": "Support",
+    "process.step5.hint": "Accompagnement",
+    "process.cta.text": "Vous voulez l'explication complète de chaque étape ?",
+    "process.cta.btn": "Demander à l'assistant IA",
     "hero.available": "Disponible pour travailler",
     "hero.title.line1": "Je Crée des",
     "hero.title.line2": "Expériences Numériques",
@@ -194,8 +228,25 @@ const translations = {
     "nav.about": "من أنا",
     "nav.projects": "المشاريع",
     "nav.services": "الخدمات",
+    "nav.process": "طريقة العمل",
     "nav.contact": "تواصل",
     "nav.cta": "لنتحدث",
+    "process.eyebrow": "طريقة العمل",
+    "process.heading.line1": "مسار واضح",
+    "process.heading.line2": "من الفكرة إلى الإطلاق",
+    "process.lead": "خمس خطوات بسيطة — اسأل المساعد الذكي ليشرح لك كل خطوة بالتفصيل.",
+    "process.step1.title": "تواصل",
+    "process.step1.hint": "ابدأ المحادثة",
+    "process.step2.title": "عرض سعر",
+    "process.step2.hint": "النطاق والتسعير",
+    "process.step3.title": "تطوير",
+    "process.step3.hint": "بناء وتحسين",
+    "process.step4.title": "تسليم",
+    "process.step4.hint": "جاهز للإطلاق",
+    "process.step5.title": "دعم",
+    "process.step5.hint": "متابعة مستمرة",
+    "process.cta.text": "تريد الشرح الكامل لكل خطوة؟",
+    "process.cta.btn": "اسأل المساعد الذكي",
     "hero.available": "متاح للعمل",
     "hero.title.line1": "أصمم تجارب",
     "hero.title.line2": "رقمية مميزة",
@@ -488,10 +539,10 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
       greeting: "Hello! I'm Mohamed Abdo, the developer. Ask me anything — projects (Cisterna, ShopHub…), services, Flutter, real-time systems, tech stack, pricing, availability, process, or how we can work together.",
       suggestions: [
         'What services do you offer?',
-        'Tell me about Cisterna',
         'How can I contact you?',
         'What technologies do you use?',
-        'Are you available for hire?'
+        'Are you available for hire?',
+        'Explain your work process'
       ],
       thinking: 'Thinking…',
       fallback: "I can help with anything related to this portfolio: projects, services, Flutter & mobile, real-time dashboards, tech stack, pricing, process, contact, or availability. Try rephrasing or ask in English, French, or Arabic.",
@@ -503,10 +554,10 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
       greeting: "Bonjour ! Je suis Mohamed Abdo, le développeur. Posez toutes vos questions — projets (Cisterna, ShopHub…), services, Flutter, systèmes temps réel, stack technique, budget, disponibilité, process, ou collaboration.",
       suggestions: [
         'Quels services offrez-vous ?',
-        'Parlez-moi de Cisterna',
         'Comment vous contacter ?',
         'Quelles technologies utilisez-vous ?',
-        'Êtes-vous disponible ?'
+        'Êtes-vous disponible ?',
+        'Expliquez votre processus de travail'
       ],
       thinking: 'Réflexion…',
       fallback: "Je peux vous aider sur tout ce qui concerne ce portfolio : projets, services, Flutter & mobile, dashboards temps réel, stack technique, budget, process, contact ou disponibilité. Reformulez ou essayez en français, anglais ou arabe.",
@@ -518,10 +569,10 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
       greeting: 'مرحباً! أنا المطور محمد عبدو. اسأل عن أي شيء — المشاريع (Cisterna، ShopHub…)، الخدمات، Flutter، الأنظمة الحية، التقنيات، الأسعار، التوفر، طريقة العمل، أو كيف نبدأ معاً.',
       suggestions: [
         'ما هي خدماتك؟',
-        'أخبرني عن Cisterna',
         'كيف أتواصل معك؟',
         'ما التقنيات التي تستخدمها؟',
-        'هل أنت متاح للعمل؟'
+        'هل أنت متاح للعمل؟',
+        'اشرح لي طريقة العمل'
       ],
       thinking: 'جاري التفكير…',
       fallback: 'يمكنني المساعدة في كل ما يخص هذا الموقع: المشاريع، الخدمات، Flutter والموبايل، اللوحات الحية، التقنيات، الأسعار، طريقة العمل، التواصل أو التوفر. أعد صياغة السؤال أو جرّب بالعربية أو الإنجليزية أو الفرنسية.',
@@ -611,9 +662,88 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
     document.getElementById('aiTyping')?.remove();
   }
 
+  function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function projectTitleOf(p) {
+    if (!p) return '';
+    // title is usually jsonb {en,fr,ar} from Supabase
+    if (typeof pickI18nLocal === 'function') return pickI18nLocal(p.title, siteLang()) || '';
+    if (typeof p.title === 'string') return p.title;
+    if (p.title && typeof p.title === 'object') {
+      const lang = siteLang();
+      return p.title[lang] || p.title.en || p.title.fr || p.title.ar || Object.values(p.title)[0] || '';
+    }
+    return '';
+  }
+
+  function buildDynamicSuggestions(lang) {
+    const base = (t('suggestions', lang) || []).slice();
+    const projectPrompts = {
+      en: (name) => `Tell me about ${name}`,
+      fr: (name) => `Parlez-moi de ${name}`,
+      ar: (name) => `أخبرني عن ${name}`,
+    };
+    const extraPrompts = {
+      en: [
+        'Show me your best projects',
+        'What makes your work different?',
+        'Can you build a mobile app for me?',
+      ],
+      fr: [
+        'Montrez-moi vos meilleurs projets',
+        'Qu’est-ce qui différencie votre travail ?',
+        'Pouvez-vous créer une application mobile ?',
+      ],
+      ar: [
+        'أظهر لي أفضل مشاريعك',
+        'ما الذي يميز عملك؟',
+        'هل يمكنك بناء تطبيق موبايل لي؟',
+      ],
+    };
+
+    const pool = base.slice();
+    // Add real project titles from DYN.projects (loaded by backend.js)
+    try {
+      const projects = (typeof DYN !== 'undefined' && Array.isArray(DYN.projects)) ? DYN.projects : [];
+      const promptFn = projectPrompts[lang] || projectPrompts.en;
+      const titles = [];
+      projects.forEach((p) => {
+        const name = (projectTitleOf(p) || '').trim();
+        if (name && name.length < 60) titles.push(name);
+      });
+      // shuffle project titles and take up to 3
+      shuffleArray(titles).slice(0, 3).forEach((name) => {
+        pool.push(promptFn(name));
+      });
+    } catch (e) { /* ignore */ }
+
+    // Add a couple of generic extra prompts
+    const extras = extraPrompts[lang] || extraPrompts.en;
+    pool.push(...extras);
+
+    // Unique + shuffle + take 5
+    const unique = [];
+    const seen = new Set();
+    shuffleArray(pool).forEach((s) => {
+      const key = String(s).trim().toLowerCase();
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      unique.push(s);
+    });
+    return unique.slice(0, 5);
+  }
+
   function renderSuggestions(lang) {
     suggestionsEl.innerHTML = '';
-    (t('suggestions', lang) || []).forEach(label => {
+    const list = buildDynamicSuggestions(lang);
+    list.forEach(label => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'ai-suggest';
@@ -665,6 +795,134 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
       }
     }
 
+    // ---- 2) Dynamic projects from backend (DYN.projects) ----
+    // If the user asks about a specific project by its stored title,
+    // return the full description / details from Supabase.
+    function i18nField(val, preferredLang) {
+      if (val == null) return '';
+      if (typeof val === 'string') return val;
+      if (typeof val === 'object') {
+        return val[preferredLang] || val.en || val.fr || val.ar || Object.values(val)[0] || '';
+      }
+      return '';
+    }
+
+    function normalizeForMatch(s) {
+      return String(s || '')
+        .toLowerCase()
+        .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function buildProjectReply(p, preferredLang) {
+      const title = i18nField(p.title, preferredLang);
+      const shortD = i18nField(p.short_description, preferredLang);
+      const fullD = i18nField(p.full_description, preferredLang);
+      const problem = i18nField(p.problem, preferredLang);
+      const solution = i18nField(p.solution, preferredLang);
+      let features = p.features;
+      if (features && typeof features === 'object' && !Array.isArray(features)) {
+        features = features[preferredLang] || features.en || features.fr || features.ar || [];
+      }
+      if (!Array.isArray(features)) features = [];
+      features = features.filter(Boolean);
+
+      const techNames = (p.project_technologies || [])
+        .map((pt) => pt.technologies && pt.technologies.name)
+        .filter(Boolean);
+
+      const lines = [];
+      if (title) lines.push(title);
+      if (shortD) lines.push(shortD);
+      if (fullD && fullD !== shortD) lines.push(fullD);
+      if (problem) {
+        const h = preferredLang === 'ar' ? 'المشكلة:' : preferredLang === 'fr' ? 'Problème :' : 'Problem:';
+        lines.push(h + '\n' + problem);
+      }
+      if (solution) {
+        const h = preferredLang === 'ar' ? 'الحل:' : preferredLang === 'fr' ? 'Solution :' : 'Solution:';
+        lines.push(h + '\n' + solution);
+      }
+      if (features.length) {
+        const h = preferredLang === 'ar' ? 'أبرز الميزات:' : preferredLang === 'fr' ? 'Fonctionnalités clés :' : 'Key features:';
+        lines.push(h + '\n' + features.map((f) => '• ' + f).join('\n'));
+      }
+      if (techNames.length) {
+        const h = preferredLang === 'ar' ? 'التقنيات:' : preferredLang === 'fr' ? 'Technologies :' : 'Tech stack:';
+        lines.push(h + ' ' + techNames.join(', '));
+      }
+      if (p.year) {
+        const h = preferredLang === 'ar' ? 'السنة:' : preferredLang === 'fr' ? 'Année :' : 'Year:';
+        lines.push(h + ' ' + p.year);
+      }
+      if (p.client_name) {
+        const h = preferredLang === 'ar' ? 'العميل:' : preferredLang === 'fr' ? 'Client :' : 'Client:';
+        lines.push(h + ' ' + p.client_name + (p.client_country ? ' · ' + p.client_country : ''));
+      }
+
+      // Links
+      const linkBits = [];
+      if (p.demo_url) linkBits.push((preferredLang === 'ar' ? 'تجربة حية' : preferredLang === 'fr' ? 'Démo' : 'Live demo') + ': ' + p.demo_url);
+      if (p.website_url) linkBits.push((preferredLang === 'ar' ? 'الموقع' : preferredLang === 'fr' ? 'Site' : 'Website') + ': ' + p.website_url);
+      if (p.github_url) linkBits.push('GitHub: ' + p.github_url);
+      if (p.app_store_url) linkBits.push('App Store: ' + p.app_store_url);
+      if (p.play_store_url) linkBits.push('Play Store: ' + p.play_store_url);
+      if (linkBits.length) lines.push(linkBits.join('\n'));
+
+      const closing = preferredLang === 'ar'
+        ? 'هل تريد تفاصيل أكثر أو مناقشة فكرة مشابهة؟'
+        : preferredLang === 'fr'
+          ? 'Voulez-vous plus de détails ou discuter d’une idée similaire ?'
+          : 'Want more details or to discuss a similar idea?';
+      lines.push(closing);
+
+      return lines.filter(Boolean).join('\n\n');
+    }
+
+    try {
+      const projects = (typeof DYN !== 'undefined' && Array.isArray(DYN.projects)) ? DYN.projects : [];
+      if (projects.length) {
+        const nq = normalizeForMatch(q);
+        // Sort by title length desc so longer/more specific titles match first
+        const ranked = projects
+          .map((p) => {
+            const titles = [];
+            const raw = p.title;
+            if (typeof raw === 'string') titles.push(raw);
+            else if (raw && typeof raw === 'object') {
+              ['ar', 'en', 'fr'].forEach((k) => { if (raw[k]) titles.push(raw[k]); });
+              Object.values(raw).forEach((v) => { if (typeof v === 'string') titles.push(v); });
+            }
+            // also match short description keywords lightly
+            return { p, titles: [...new Set(titles.map(normalizeForMatch).filter((t) => t.length >= 3))] };
+          })
+          .filter((x) => x.titles.length);
+
+        ranked.sort((a, b) => Math.max(...b.titles.map((t) => t.length)) - Math.max(...a.titles.map((t) => t.length)));
+
+        for (const { p, titles } of ranked) {
+          const hit = titles.some((t) => {
+            // full title inside query, or query inside title (for short names),
+            // or significant overlap (all important words of title appear in query)
+            if (nq.includes(t) || t.includes(nq)) return true;
+            const words = t.split(' ').filter((w) => w.length >= 3);
+            if (words.length >= 2) {
+              const matched = words.filter((w) => nq.includes(w));
+              if (matched.length >= Math.ceil(words.length * 0.6)) return true;
+            }
+            return false;
+          });
+          if (hit) {
+            const reply = buildProjectReply(p, lang);
+            if (reply && reply.trim()) return reply.trim();
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[AI Chat] project match failed', e);
+    }
+
     // Helper: test if query matches any of the given patterns (local fallback)
     const match = (...patterns) => patterns.some(p => {
       if (p instanceof RegExp) return p.test(q);
@@ -679,6 +937,15 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
       || q.length < 3
     ) {
       return t('greeting', lang);
+    }
+
+    /* ---------- Work process (5 steps) ---------- */
+    if (match(
+      /process|workflow|how you work|how do you work|méthode|processus|comment tu travailles|comment vous travaillez|طريقة العمل|كيف تعمل|كيف تشتغل|خطوات العمل|مراحل|devis|عرض سعر|تسليم|support|دعم بعد/
+    )) {
+      if (isAr) return 'طريقة العمل معي تمر بـ 5 خطوات واضحة:\n\n1) تواصل\nترسل فكرتك أو احتياجك (واتساب، إيميل، أو من النموذج في الموقع). نحدد الهدف والنطاق بشكل مبدئي.\n\n2) عرض سعر\nبعد فهم المتطلبات أرسل عرضاً واضحاً: المهام، المدة التقديرية، والتكلفة. لا نبدأ قبل الاتفاق.\n\n3) تطوير\nأبني المنتج على مراحل مع تحديثات منتظمة، وتجربة النسخ أثناء العمل حتى تكون راضياً عن الاتجاه.\n\n4) تسليم\nتسليم النسخة النهائية، النشر (متاجر / سيرفر)، مع تسليم الملفات والصلاحيات اللازمة.\n\n5) دعم\nمتابعة بعد الإطلاق لإصلاح المشاكل الصغيرة والمساعدة في التحسينات عند الحاجة.\n\nهل تريد تفاصيل عن خطوة معينة أو تقدير لمشروعك؟';
+      if (isFr) return 'Mon processus de travail en 5 étapes claires :\n\n1) Contact\nVous partagez votre idée ou besoin (WhatsApp, email ou formulaire). On clarifie l’objectif et le périmètre.\n\n2) Devis\nAprès analyse, je fournis un devis clair : tâches, délai estimé et budget. On ne démarre qu’après accord.\n\n3) Développement\nJe construis le produit par étapes, avec des mises à jour régulières et des versions testables.\n\n4) Livraison\nLivraison de la version finale, publication (stores / serveur) et transmission des accès et fichiers.\n\n5) Support\nAccompagnement après le lancement pour les correctifs et améliorations si besoin.\n\nVoulez-vous le détail d’une étape ou une estimation pour votre projet ?';
+      return 'My work process in 5 clear steps:\n\n1) Contact\nYou share your idea or need (WhatsApp, email, or the site form). We clarify the goal and scope.\n\n2) Quote\nAfter understanding the requirements, I send a clear quote: tasks, estimated timeline, and cost. We start only after agreement.\n\n3) Development\nI build the product in stages with regular updates and testable versions so you can follow progress.\n\n4) Delivery\nFinal version delivery, publishing (stores / server), and handover of files and access.\n\n5) Support\nPost-launch support for small fixes and improvements when needed.\n\nWant details on a specific step or an estimate for your project?';
     }
 
     /* ---------- Who / About ---------- */
@@ -730,9 +997,22 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
     if (match(
       /project|projects|projet|projets|مشروع|مشاريع|أعمالك|portfolio|travaux|show me|أظهر|عرض|montrez|vos réalisations|what have you built|ماذا بنيت/
     )) {
-      if (isAr) return 'من أبرز مشاريعي:\n• Cisterna — منصة توصيل صهاريج مياه (تطبيق عميل + تطبيق سائق + لوحة إدارة حية)\n• ShopHub — متجر إلكتروني كامل (سلة، دفع، إدارة طلبات)\n• Analytics Dashboard — لوحة ذكاء أعمال حية\n• Chatify — تطبيق مراسلة فورية مع مجموعات وحالة اتصال\nتصفح قسم المشاريع في الموقع للتفاصيل والصور. هل تريد تفاصيل عن مشروع معين؟';
-      if (isFr) return 'Quelques projets phares :\n• Cisterna — plateforme de livraison de citernes d’eau (app client, chauffeur, dashboard live)\n• ShopHub — e-commerce complet (panier, paiement, gestion commandes)\n• Analytics Dashboard — BI en temps réel\n• Chatify — messagerie temps réel (groupes, présence)\nExplorez la section Projets du site. Voulez-vous les détails d’un projet précis ?';
-      return 'Featured projects include:\n• Cisterna — water tanker delivery platform (customer app, driver app, live admin dashboard)\n• ShopHub — full e-commerce (cart, checkout, order management)\n• Analytics Dashboard — live business intelligence\n• Chatify — real-time messaging with groups & presence\nBrowse the Projects section on this site. Want details on a specific one?';
+      try {
+        const projects = (typeof DYN !== 'undefined' && Array.isArray(DYN.projects)) ? DYN.projects : [];
+        if (projects.length) {
+          const bullets = projects.slice(0, 8).map((p) => {
+            const title = i18nField(p.title, lang);
+            const shortD = i18nField(p.short_description, lang);
+            return '• ' + title + (shortD ? ' — ' + shortD : '');
+          });
+          if (isAr) return 'من أبرز مشاريعي:\n' + bullets.join('\n') + '\n\nتصفح قسم المشاريع في الموقع للتفاصيل والصور. اكتب اسم أي مشروع لأعطيك الوصف الكامل.';
+          if (isFr) return 'Quelques projets :\n' + bullets.join('\n') + '\n\nExplorez la section Projets du site. Écrivez le nom d’un projet pour le détail complet.';
+          return 'Featured projects:\n' + bullets.join('\n') + '\n\nBrowse the Projects section on this site. Type a project name for the full description.';
+        }
+      } catch (e) {}
+      if (isAr) return 'يمكنك تصفح قسم المشاريع في الموقع لرؤية أعمالي. اكتب اسم أي مشروع لأعطيك تفاصيله.';
+      if (isFr) return 'Parcourez la section Projets du site. Écrivez le nom d’un projet pour plus de détails.';
+      return 'Browse the Projects section on this site. Type a project name for full details.';
     }
 
     /* ---------- Specific project: Cisterna ---------- */
@@ -947,6 +1227,33 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
 
   // Initial chrome
   updateChrome(siteLang());
+
+  // When backend finishes loading projects, refresh suggestions so
+  // project titles appear in the random chips.
+  document.addEventListener('portfolio-data-loaded', () => {
+    if (widget.classList.contains('is-open')) {
+      renderSuggestions(siteLang());
+    }
+  });
+
+  // Process section CTA → open chat and ask about the work process
+  const processBtn = document.getElementById('processAskAi');
+  if (processBtn) {
+    processBtn.addEventListener('click', () => {
+      const lang = siteLang();
+      const prompts = {
+        en: 'Explain your work process',
+        fr: 'Expliquez votre processus de travail',
+        ar: 'اشرح لي طريقة العمل',
+      };
+      openChat();
+      setTimeout(() => {
+        if (!input || !form) return;
+        input.value = prompts[lang] || prompts.en;
+        form.dispatchEvent(new Event('submit', { cancelable: true }));
+      }, 320);
+    });
+  }
   } // end boot
 
   if (document.readyState === 'loading') {
