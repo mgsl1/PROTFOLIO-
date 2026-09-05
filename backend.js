@@ -35,6 +35,7 @@ const DYN = {
   hero: null, about: null, statistics: null, services: null,
   technologies: null, categories: null, projects: null,
   contactInfo: null, socialLinks: null,
+  seo: null, siteSettings: null,
 };
 
 /* ============================================================
@@ -849,6 +850,65 @@ function buildContactForm() {
 }
 
 /* ============================================================
+   SEO / Open Graph (controlled from Admin → SEO, page_key = home)
+============================================================ */
+function setMeta(attr, key, value) {
+  if (value === null || value === undefined) return;
+  let el = document.querySelector(`meta[${attr}="${key}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute(attr, key);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", value);
+}
+
+function applySeoMeta() {
+  const seo = DYN.seo;
+  const site = DYN.siteSettings;
+  const lang = currentLang();
+
+  const title =
+    (seo && (pickI18n(seo.og_title) || pickI18n(seo.title))) ||
+    document.title ||
+    "Mohamed Abdo — Software Developer";
+  const description =
+    (seo && (pickI18n(seo.og_description) || pickI18n(seo.description))) ||
+    document.querySelector('meta[name="description"]')?.content ||
+    "";
+  let image = (seo && seo.og_image_url) || "";
+  let siteUrl = (site && site.site_url) || window.location.origin;
+  if (image && !/^https?:\/\//i.test(image)) {
+    image = siteUrl.replace(/\/$/, "") + (image.startsWith("/") ? image : "/" + image);
+  }
+  const pageUrl = (seo && seo.canonical_url) || (siteUrl.replace(/\/$/, "") + window.location.pathname);
+
+  if (title) document.title = title;
+
+  setMeta("name", "description", description);
+  if (seo) {
+    const robots = [
+      seo.robots_index === false ? "noindex" : "index",
+      seo.robots_follow === false ? "nofollow" : "follow",
+    ].join(", ");
+    setMeta("name", "robots", robots);
+  }
+
+  setMeta("property", "og:type", "website");
+  setMeta("property", "og:site_name", (site && site.site_name) || "Mohamed Abdo");
+  setMeta("property", "og:title", title);
+  setMeta("property", "og:description", description);
+  if (image) setMeta("property", "og:image", image);
+  setMeta("property", "og:url", pageUrl);
+  setMeta("property", "og:locale", lang === "ar" ? "ar_AR" : lang === "fr" ? "fr_FR" : "en_US");
+
+  setMeta("name", "twitter:card", "summary_large_image");
+  setMeta("name", "twitter:title", title);
+  setMeta("name", "twitter:description", description);
+  if (image) setMeta("name", "twitter:image", image);
+}
+
+/* ============================================================
    RE-PAINT ON LANGUAGE CHANGE
 ============================================================ */
 function repaintAllDynamic() {
@@ -859,6 +919,7 @@ function repaintAllDynamic() {
   paintTechnologies();
   paintProjects();
   updateContactFormLanguage();
+  applySeoMeta();
 }
 document.querySelectorAll(".lang-menu li").forEach((li) => {
   li.addEventListener("click", () => setTimeout(repaintAllDynamic, 0));
@@ -879,7 +940,8 @@ async function initBackend() {
   // Parallel fetch for speed — all tables load at once
   const [
     hero, about, contactInfo, statistics, services,
-    technologies, categories, socialLinks, projects
+    technologies, categories, socialLinks, projects,
+    seo, siteSettings
   ] = await Promise.all([
     safe("hero_section", sbClient.from("hero_section").select("*").limit(1).maybeSingle()),
     safe("about_section", sbClient.from("about_section").select("*").limit(1).maybeSingle()),
@@ -892,6 +954,8 @@ async function initBackend() {
     safe("projects", sbClient.from("projects")
       .select("*, project_category_links(category_id), project_technologies(technologies(name)), project_media(*)")
       .eq("status", "published").eq("is_visible", true).order("sort_order")),
+    safe("seo_settings", sbClient.from("seo_settings").select("*").eq("page_key", "home").limit(1).maybeSingle()),
+    safe("site_settings", sbClient.from("site_settings").select("*").limit(1).maybeSingle()),
   ]);
 
   DYN.hero = hero;
@@ -903,10 +967,13 @@ async function initBackend() {
   DYN.categories = categories;
   DYN.socialLinks = socialLinks;
   DYN.projects = projects;
+  DYN.seo = seo;
+  DYN.siteSettings = siteSettings;
 
   repaintAllDynamic();
   paintContactInfo();
   paintSocialLinks();
+  applySeoMeta();
 
   // Record a site visit (once per visitor per day)
   trackSiteVisit();
