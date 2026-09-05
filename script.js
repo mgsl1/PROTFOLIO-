@@ -55,7 +55,7 @@ renderSocialIcons();
 ========================================================= */
 const translations = {
   en: {
-    "meta.title": "Mohamed Abdo — Software Developer",
+    "meta.title": "Mohamed Abdo | Flutter & Full-Stack Developer",
     "nav.home": "Home",
     "nav.about": "About",
     "nav.projects": "Projects",
@@ -122,7 +122,7 @@ const translations = {
     "footer.copy": "Built from scratch, no templates."
   },
   fr: {
-    "meta.title": "Mohamed Abdo — Développeur Logiciel",
+    "meta.title": "Mohamed Abdo | Développeur Flutter & Full-Stack",
     "nav.home": "Accueil",
     "nav.about": "À propos",
     "nav.projects": "Projets",
@@ -189,7 +189,7 @@ const translations = {
     "footer.copy": "Construit à partir de zéro, sans templates."
   },
   ar: {
-    "meta.title": "محمد عبده — مطوّر برمجيات",
+    "meta.title": "محمد عبده | مطوّر Flutter و Full-Stack",
     "nav.home": "الرئيسية",
     "nav.about": "من أنا",
     "nav.projects": "المشاريع",

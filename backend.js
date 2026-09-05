@@ -850,7 +850,7 @@ function buildContactForm() {
 }
 
 /* ============================================================
-   SEO / Open Graph (controlled from Admin → SEO, page_key = home)
+   SEO / Open Graph (Admin → SEO, page_key = home)
 ============================================================ */
 function setMeta(attr, key, value) {
   if (value === null || value === undefined) return;
@@ -871,20 +871,22 @@ function applySeoMeta() {
   const title =
     (seo && (pickI18n(seo.og_title) || pickI18n(seo.title))) ||
     document.title ||
-    "Mohamed Abdo — Software Developer";
+    "Mohamed Abdo | Flutter & Full-Stack Developer";
   const description =
     (seo && (pickI18n(seo.og_description) || pickI18n(seo.description))) ||
     document.querySelector('meta[name="description"]')?.content ||
     "";
   let image = (seo && seo.og_image_url) || "";
-  let siteUrl = (site && site.site_url) || window.location.origin;
+  let siteUrl = (site && site.site_url) || "https://mohamedabdoprotportfolio.vercel.app";
   if (image && !/^https?:\/\//i.test(image)) {
     image = siteUrl.replace(/\/$/, "") + (image.startsWith("/") ? image : "/" + image);
   }
-  const pageUrl = (seo && seo.canonical_url) || (siteUrl.replace(/\/$/, "") + window.location.pathname);
+  if (!image) {
+    image = "https://kmnpmcsrzcuzlpcdfrvc.supabase.co/storage/v1/object/public/portfolio/seo/1788633517525-1h5zas6.png";
+  }
+  const pageUrl = (seo && seo.canonical_url) || (siteUrl.replace(/\/$/, "") + "/");
 
   if (title) document.title = title;
-
   setMeta("name", "description", description);
   if (seo) {
     const robots = [
@@ -898,14 +900,14 @@ function applySeoMeta() {
   setMeta("property", "og:site_name", (site && site.site_name) || "Mohamed Abdo");
   setMeta("property", "og:title", title);
   setMeta("property", "og:description", description);
-  if (image) setMeta("property", "og:image", image);
+  setMeta("property", "og:image", image);
   setMeta("property", "og:url", pageUrl);
   setMeta("property", "og:locale", lang === "ar" ? "ar_AR" : lang === "fr" ? "fr_FR" : "en_US");
 
   setMeta("name", "twitter:card", "summary_large_image");
   setMeta("name", "twitter:title", title);
   setMeta("name", "twitter:description", description);
-  if (image) setMeta("name", "twitter:image", image);
+  setMeta("name", "twitter:image", image);
 }
 
 /* ============================================================
