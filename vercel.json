@@ -1,0 +1,6 @@
+{
+  "version": 2,
+  "routes": [
+    { "src": "/api/project-share", "dest": "/api/project-share.js" }
+  ]
+}

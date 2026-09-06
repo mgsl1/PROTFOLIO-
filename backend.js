@@ -437,6 +437,411 @@ function wireLikeButtons(root = document) {
 }
 
 /* ============================================================
+   PROJECT SHARE — link based on project id (?project=<id>)
+============================================================ */
+function getProjectShareUrl(projectId) {
+  // Share via /api/project-share so WhatsApp/Facebook/etc. get real OG
+  // title + description + project image. Humans are redirected to /?project=id.
+  const site =
+    (DYN.siteSettings && DYN.siteSettings.site_url) ||
+    window.location.origin ||
+    "https://mohamedabdoprotportfolio.vercel.app";
+  const base = String(site).replace(/\/$/, "");
+  return base + "/api/project-share?id=" + encodeURIComponent(String(projectId));
+}
+
+function shareLabel() {
+  return { en: "Share", fr: "Partager", ar: "مشاركة" }[currentLang()] || "Share";
+}
+
+function shareCopiedLabel() {
+  return { en: "Link copied!", fr: "Lien copié !", ar: "تم نسخ الرابط!" }[currentLang()] || "Link copied!";
+}
+
+function shareButtonHtml(projectId, sizeClass = "") {
+  const label = shareLabel();
+  return `
+    <button type="button" class="share-btn${sizeClass ? " " + sizeClass : ""}"
+      data-project-id="${escHtml(String(projectId))}"
+      aria-label="${escHtml(label)}"
+      title="${escHtml(label)}">
+      <svg class="share-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+    </button>
+  `;
+}
+
+function showShareToast(message) {
+  let toast = document.getElementById("shareToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "shareToast";
+    toast.className = "share-toast";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(showShareToast._t);
+  showShareToast._t = setTimeout(() => toast.classList.remove("show"), 2200);
+}
+
+function closeShareSheet() {
+  const sheet = document.getElementById("shareSheetOverlay");
+  if (!sheet) return;
+  sheet.classList.remove("show");
+  setTimeout(() => sheet.remove(), 280);
+}
+
+async function copyTextToClipboard(text) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (_) { /* fall through */ }
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand("copy");
+    ta.remove();
+    return !!ok;
+  } catch (_) {
+    return false;
+  }
+}
+
+function shareSheetLabels() {
+  const lang = currentLang();
+  const map = {
+    en: {
+      title: "Share project",
+      copy: "Copy link",
+      copied: "Link copied!",
+      whatsapp: "WhatsApp",
+      messenger: "Messenger",
+      telegram: "Telegram",
+      facebook: "Facebook",
+      x: "X / Twitter",
+      linkedin: "LinkedIn",
+      email: "Email",
+      sms: "SMS",
+      instagram: "Instagram",
+      snapchat: "Snapchat",
+      more: "More…",
+      cancel: "Cancel",
+      instagramHint: "Link copied — paste it in your Instagram story or bio",
+      snapchatHint: "Link copied — paste it in Snapchat",
+    },
+    fr: {
+      title: "Partager le projet",
+      copy: "Copier le lien",
+      copied: "Lien copié !",
+      whatsapp: "WhatsApp",
+      messenger: "Messenger",
+      telegram: "Telegram",
+      facebook: "Facebook",
+      x: "X / Twitter",
+      linkedin: "LinkedIn",
+      email: "E-mail",
+      sms: "SMS",
+      instagram: "Instagram",
+      snapchat: "Snapchat",
+      more: "Plus…",
+      cancel: "Annuler",
+      instagramHint: "Lien copié — collez-le dans votre story ou bio Instagram",
+      snapchatHint: "Lien copié — collez-le dans Snapchat",
+    },
+    ar: {
+      title: "مشاركة المشروع",
+      copy: "نسخ الرابط",
+      copied: "تم نسخ الرابط!",
+      whatsapp: "واتساب",
+      messenger: "ماسنجر",
+      telegram: "تيليجرام",
+      facebook: "فيسبوك",
+      x: "إكس / تويتر",
+      linkedin: "لينكدإن",
+      email: "البريد",
+      sms: "رسالة SMS",
+      instagram: "إنستغرام",
+      snapchat: "سناب شات",
+      more: "المزيد…",
+      cancel: "إلغاء",
+      instagramHint: "تم نسخ الرابط — الصقه في ستوري أو بايو إنستغرام",
+      snapchatHint: "تم نسخ الرابط — الصقه في سناب شات",
+    },
+  };
+  return map[lang] || map.en;
+}
+
+function openExternalShare(href) {
+  try {
+    window.open(href, "_blank", "noopener,noreferrer");
+  } catch (_) {
+    window.location.href = href;
+  }
+}
+
+async function shareProject(projectId, btn) {
+  if (!projectId) return;
+  const url = getProjectShareUrl(projectId);
+  const project = (DYN.projects || []).find((p) => String(p.id) === String(projectId));
+  const title = project ? (pickI18n(project.title) || document.title) : document.title;
+  const text = title;
+  const L = shareSheetLabels();
+  const encodedUrl = encodeURIComponent(url);
+  const encodedText = encodeURIComponent(text);
+  const encodedPair = encodeURIComponent(text + "\n" + url);
+
+  closeShareSheet();
+
+  const channels = [
+    {
+      id: "copy",
+      label: L.copy,
+      className: "ss-copy",
+      icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`,
+      action: async () => {
+        const ok = await copyTextToClipboard(url);
+        showShareToast(ok ? L.copied : url);
+        if (btn) {
+          btn.classList.add("share-copied");
+          setTimeout(() => btn.classList.remove("share-copied"), 1200);
+        }
+        closeShareSheet();
+      },
+    },
+    {
+      id: "whatsapp",
+      label: L.whatsapp,
+      className: "ss-wa",
+      icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M17.47 14.38c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z"/><path d="M12 2a10 10 0 0 0-8.7 14.95L2.3 21.7l4.87-1.28A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-2.89.76.77-2.82-.2-.31A8.2 8.2 0 1 1 12 20.2z"/></svg>`,
+      action: () => {
+        openExternalShare(`https://wa.me/?text=${encodedPair}`);
+        closeShareSheet();
+      },
+    },
+    {
+      id: "messenger",
+      label: L.messenger,
+      className: "ss-ms",
+      icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2C6.48 2 2 6.14 2 11.25c0 2.9 1.45 5.48 3.72 7.18V22l3.4-1.87c.9.25 1.86.38 2.88.38 5.52 0 10-4.14 10-9.26S17.52 2 12 2zm1.02 12.48-2.55-2.72-4.98 2.72 5.48-5.82 2.61 2.72 4.92-2.72-5.48 5.82z"/></svg>`,
+      action: () => {
+        const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (isMobile) {
+          // Prefer native Messenger scheme; falls back to web Facebook share
+          openExternalShare(`fb-messenger://share/?link=${encodedUrl}`);
+          setTimeout(() => openExternalShare(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`), 600);
+        } else {
+          openExternalShare(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`);
+        }
+        closeShareSheet();
+      },
+    },
+    {
+      id: "telegram",
+      label: L.telegram,
+      className: "ss-tg",
+      icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M21.95 4.3c-.22-.2-.54-.25-.82-.13L2.7 11.6c-.33.14-.55.45-.55.8 0 .34.2.65.52.8l4.56 2.15 1.76 5.5c.1.31.37.53.7.57h.06c.3 0 .58-.17.72-.44l2.55-4.8 4.9 3.6c.14.1.3.15.47.15.14 0 .28-.03.4-.1.27-.15.44-.42.45-.73l1.3-13.2c.03-.34-.13-.66-.42-.9zM9.6 14.1l7.9-6.9-6.4 8.05-.2.24-.9 3.38-.95-2.97 1.55-1.8z"/></svg>`,
+      action: () => {
+        openExternalShare(`https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`);
+        closeShareSheet();
+      },
+    },
+    {
+      id: "facebook",
+      label: L.facebook,
+      className: "ss-fb",
+      icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M13.5 22v-8h2.7l.4-3.1h-3.1V8.9c0-.9.3-1.5 1.6-1.5H16.7V4.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.4H7.3V14h2.7v8h3.5z"/></svg>`,
+      action: () => {
+        openExternalShare(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`);
+        closeShareSheet();
+      },
+    },
+    {
+      id: "x",
+      label: L.x,
+      className: "ss-x",
+      icon: `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18.9 2H21.7l-6.8 7.8L23 22h-6.4l-5-6.5L6 22H3.2l7.3-8.3L1 2h6.6l4.5 5.9L18.9 2zm-1.1 18h1.8L7.3 3.9H5.4L17.8 20z"/></svg>`,
+      action: () => {
+        openExternalShare(`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`);
+        closeShareSheet();
+      },
+    },
+    {
+      id: "linkedin",
+      label: L.linkedin,
+      className: "ss-li",
+      icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6.5 9H3.7v11.5h2.8V9zM5.1 3.4C4.1 3.4 3.3 4.2 3.3 5.2s.8 1.8 1.8 1.8 1.8-.8 1.8-1.8-.8-1.8-1.8-1.8zM20.7 13.4c0-3-1.6-4.4-3.8-4.4-1.7 0-2.5.9-2.9 1.6h-.1V9H11.2c0 .8 0 11.5 0 11.5h2.8v-6.4c0-.3 0-.7.1-1 .3-.7.9-1.4 2-1.4 1.4 0 2 1.1 2 2.7v6.1h2.8v-6.5z"/></svg>`,
+      action: () => {
+        openExternalShare(`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`);
+        closeShareSheet();
+      },
+    },
+    {
+      id: "email",
+      label: L.email,
+      className: "ss-mail",
+      icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><polyline points="22 6 12 13 2 6"/></svg>`,
+      action: () => {
+        openExternalShare(`mailto:?subject=${encodedText}&body=${encodedPair}`);
+        closeShareSheet();
+      },
+    },
+    {
+      id: "sms",
+      label: L.sms,
+      className: "ss-sms",
+      icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
+      action: () => {
+        openExternalShare(`sms:?&body=${encodedPair}`);
+        closeShareSheet();
+      },
+    },
+    {
+      id: "instagram",
+      label: L.instagram,
+      className: "ss-ig",
+      icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5zm0 2A2.5 2.5 0 1 0 14.5 12 2.5 2.5 0 0 0 12 9.5zM17.5 6.8a1.1 1.1 0 1 1-1.1 1.1 1.1 1.1 0 0 1 1.1-1.1z"/></svg>`,
+      action: async () => {
+        await copyTextToClipboard(url);
+        showShareToast(L.instagramHint);
+        closeShareSheet();
+      },
+    },
+    {
+      id: "snapchat",
+      label: L.snapchat,
+      className: "ss-snap",
+      icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12.05 2c-2.7 0-4.5 1.8-4.5 4.5v1.1c-1.4.3-2.3 1.1-2.6 2.3-.2.7-.1 1.4.2 2 .3.6.2 1-.2 1.5-.5.6-1.2 1-1.3 1.6-.1.6.4 1.1 1.1 1.3.4.1.7.3.8.5.2.4 0 .9-.5 1.4-.7.7-1.1 1.5-.9 2.3.2.8 1 1.3 2.2 1.5 1 .2 1.7.6 2.2 1.2.5.6 1.2.9 2 .9s1.5-.3 2-.9c.5-.6 1.2-1 2.2-1.2 1.2-.2 2-.7 2.2-1.5.2-.8-.2-1.6-.9-2.3-.5-.5-.7-1-.5-1.4.1-.2.4-.4.8-.5.7-.2 1.2-.7 1.1-1.3-.1-.6-.8-1-1.3-1.6-.4-.5-.5-.9-.2-1.5.3-.6.4-1.3.2-2-.3-1.2-1.2-2-2.6-2.3V6.5C16.55 3.8 14.75 2 12.05 2z"/></svg>`,
+      action: async () => {
+        await copyTextToClipboard(url);
+        showShareToast(L.snapchatHint);
+        closeShareSheet();
+      },
+    },
+  ];
+
+  if (typeof navigator.share === "function") {
+    channels.push({
+      id: "native",
+      label: L.more,
+      className: "ss-more",
+      icon: `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>`,
+      action: async () => {
+        closeShareSheet();
+        try {
+          await navigator.share({ title, text, url });
+        } catch (e) {
+          if (e && e.name === "AbortError") return;
+          console.warn("Native share failed:", e);
+        }
+      },
+    });
+  }
+
+  const overlay = document.createElement("div");
+  overlay.id = "shareSheetOverlay";
+  overlay.className = "ss-overlay";
+  overlay.innerHTML = `
+    <div class="ss-sheet" role="dialog" aria-modal="true" aria-labelledby="ssTitle">
+      <div class="ss-handle" aria-hidden="true"></div>
+      <div class="ss-header">
+        <h3 id="ssTitle">${escHtml(L.title)}</h3>
+        <button type="button" class="ss-close" aria-label="${escHtml(L.cancel)}">×</button>
+      </div>
+      <p class="ss-project-title">${escHtml(title)}</p>
+      <div class="ss-link-row">
+        <input type="text" class="ss-link-input" readonly value="${escHtml(url)}" aria-label="${escHtml(L.copy)}">
+        <button type="button" class="ss-link-copy btn btn-primary">${escHtml(L.copy)}</button>
+      </div>
+      <div class="ss-grid">
+        ${channels.map((c) => `
+          <button type="button" class="ss-item ${c.className}" data-share-id="${c.id}">
+            <span class="ss-icon">${c.icon}</span>
+            <span class="ss-label">${escHtml(c.label)}</span>
+          </button>
+        `).join("")}
+      </div>
+      <button type="button" class="ss-cancel">${escHtml(L.cancel)}</button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add("show"));
+
+  const byId = Object.fromEntries(channels.map((c) => [c.id, c]));
+  overlay.querySelectorAll("[data-share-id]").forEach((el) => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const ch = byId[el.dataset.shareId];
+      if (ch) ch.action();
+    });
+  });
+  overlay.querySelector(".ss-link-copy")?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const ok = await copyTextToClipboard(url);
+    showShareToast(ok ? L.copied : url);
+    closeShareSheet();
+  });
+  overlay.querySelector(".ss-link-input")?.addEventListener("click", (e) => {
+    e.target.select?.();
+  });
+  overlay.querySelector(".ss-close")?.addEventListener("click", closeShareSheet);
+  overlay.querySelector(".ss-cancel")?.addEventListener("click", closeShareSheet);
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) closeShareSheet();
+  });
+  const onKey = (e) => {
+    if (e.key === "Escape") {
+      closeShareSheet();
+      document.removeEventListener("keydown", onKey);
+    }
+  };
+  document.addEventListener("keydown", onKey);
+}
+
+function wireShareButtons(root = document) {
+  root.querySelectorAll(".share-btn").forEach((btn) => {
+    if (btn.dataset.wired === "1") return;
+    btn.dataset.wired = "1";
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      shareProject(btn.dataset.projectId, btn);
+    });
+  });
+}
+
+/** Open project modal if URL has ?project=<id> or #project=<id> */
+function openProjectFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  let id = params.get("project");
+  if (!id && window.location.hash) {
+    const m = window.location.hash.match(/[#&?]project=([^&]+)/i) || window.location.hash.match(/^#project[=/](.+)$/i);
+    if (m) id = decodeURIComponent(m[1]);
+  }
+  if (!id) return;
+  const project = (DYN.projects || []).find((p) => String(p.id) === String(id));
+  if (project) {
+    // Scroll to projects section then open
+    const sec = document.getElementById("projects");
+    if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
+    openProjectModal(project);
+  }
+}
+
+/* ============================================================
    PROJECTS + CATEGORIES (with client-side filtering)
 ============================================================ */
 function paintProjects() {
@@ -477,7 +882,10 @@ function paintProjects() {
       <article class="project-card reveal${p.featured ? " featured" : ""}" data-cat="${escHtml(catSlugs)}" data-project-idx="${idx}" role="button" tabindex="0">
         <div class="project-thumb" style="${img ? `background:center/cover no-repeat url('${escHtml(img)}');` : ""}">
           ${p.badge ? `<span class="project-badge">${escHtml(pickI18n(p.badge))}</span>` : ""}
-          <div class="project-like-wrap">${likeButtonHtml(p.id, likes)}</div>
+          <div class="project-actions-wrap">
+            ${shareButtonHtml(p.id)}
+            ${likeButtonHtml(p.id, likes)}
+          </div>
         </div>
         <div class="project-body">
           <h3>${escHtml(pickI18n(p.title))}</h3>
@@ -493,10 +901,10 @@ function paintProjects() {
     gridWrap.querySelectorAll(".project-card").forEach((el) => revealObserver.observe(el));
   }
 
-  // Click / keyboard → open project detail modal (ignore clicks on like button)
+  // Click / keyboard → open project detail modal (ignore clicks on like/share buttons)
   gridWrap.querySelectorAll(".project-card").forEach((card) => {
     const open = (e) => {
-      if (e.target.closest(".like-btn")) return;
+      if (e.target.closest(".like-btn, .share-btn")) return;
       const idx = Number(card.dataset.projectIdx);
       const project = projects[idx];
       if (project) openProjectModal(project);
@@ -504,7 +912,7 @@ function paintProjects() {
     card.addEventListener("click", open);
     card.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
-        if (e.target.closest(".like-btn")) return;
+        if (e.target.closest(".like-btn, .share-btn")) return;
         e.preventDefault();
         open(e);
       }
@@ -512,7 +920,9 @@ function paintProjects() {
   });
 
   wireLikeButtons(gridWrap);
+  wireShareButtons(gridWrap);
   wireProjectFilters();
+  openProjectFromUrl();
 }
 
 function wireProjectFilters() {
@@ -652,7 +1062,10 @@ function openProjectModal(p) {
               ${p.badge ? `<span class="pm-badge">${escHtml(pickI18n(p.badge))}</span>` : ""}
               <h2 id="pmTitle">${escHtml(pickI18n(p.title))}</h2>
             </div>
-            ${likeButtonHtml(p.id, p.likes_count ?? 0, "like-btn-lg")}
+            <div class="pm-title-actions">
+              ${shareButtonHtml(p.id, "share-btn-lg")}
+              ${likeButtonHtml(p.id, p.likes_count ?? 0, "like-btn-lg")}
+            </div>
           </div>
           ${pickI18n(p.short_description) ? `<p class="pm-lead">${escHtml(pickI18n(p.short_description))}</p>` : ""}
           ${metaBits.length ? `<div class="pm-meta">${metaBits.join("")}</div>` : ""}
@@ -699,6 +1112,7 @@ function openProjectModal(p) {
   document.body.style.overflow = "hidden";
   requestAnimationFrame(() => overlay.classList.add("show"));
   wireLikeButtons(overlay);
+  wireShareButtons(overlay);
 
   // Close handlers
   overlay.querySelector(".pm-close").addEventListener("click", closeProjectModal);
