@@ -1,3 +1,199 @@
+
+/* ---------- Preloader (fully controllable from Admin → Preloader Settings) ---------- */
+(function () {
+  const preloader = document.getElementById("preloader");
+  if (!preloader) return;
+
+  document.body.classList.add("is-loading");
+
+  const DEFAULTS = {
+    is_enabled: true,
+    min_duration_ms: 2600,
+    show_logo: true,
+    show_cube: true,
+    show_code: true,
+    show_progress_bar: true,
+    show_text: true,
+    loading_text: { en: "Initializing", fr: "Initialisation", ar: "جاري التهيئة" },
+    code_line_1: 'const portfolio = "loading";',
+    code_line_2: "await build();",
+    logo_url: "",
+    background_color: "#0a0806",
+    accent_color: "#e0a526",
+    text_color: "#a89e8c",
+    code_bg_color: "rgba(255,255,255,0.03)",
+    bar_track_color: "rgba(255,255,255,0.08)",
+    custom_css: "",
+  };
+
+  function pickLangText(val) {
+    if (val == null) return "";
+    if (typeof val === "string") return val;
+    const lang =
+      (document.documentElement && document.documentElement.lang) ||
+      (localStorage.getItem("lang") || localStorage.getItem("portfolioLang") || "en");
+    const code = String(lang).slice(0, 2).toLowerCase();
+    return val[code] || val.en || val.fr || val.ar || Object.values(val)[0] || "";
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function escapeCodeLine(raw) {
+    let out = escapeHtml(String(raw || ""));
+    out = out
+      .replace(/\b(const|let|var|await|async|function|return|new)\b/g, '<span class="c-kw">$1</span>')
+      .replace(/"([^"]*)"/g, '<span class="c-str">"$1"</span>')
+      .replace(/'([^']*)'/g, "<span class=\"c-str\">'$1'</span>")
+      .replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?=\()/g, '<span class="c-fn">$1</span>');
+    return out;
+  }
+
+  function applySettings(cfg) {
+    if (!cfg || cfg.is_enabled === false) {
+      preloader.classList.add("is-done");
+      document.body.classList.remove("is-loading");
+      try { preloader.remove(); } catch (_) {}
+      return false;
+    }
+
+    preloader.style.setProperty("--preloader-bg", cfg.background_color || DEFAULTS.background_color);
+    preloader.style.setProperty("--preloader-accent", cfg.accent_color || DEFAULTS.accent_color);
+    preloader.style.setProperty("--preloader-text", cfg.text_color || DEFAULTS.text_color);
+    preloader.style.setProperty("--preloader-code-bg", cfg.code_bg_color || DEFAULTS.code_bg_color);
+    preloader.style.setProperty("--preloader-bar-track", cfg.bar_track_color || DEFAULTS.bar_track_color);
+    preloader.style.background = cfg.background_color || DEFAULTS.background_color;
+
+    const cube = preloader.querySelector(".preloader-cube");
+    const logo = preloader.querySelector(".preloader-logo");
+    const code = preloader.querySelector(".preloader-code");
+    const bar = preloader.querySelector(".preloader-bar");
+    const textEl = preloader.querySelector(".preloader-text");
+
+    if (cube) cube.style.display = cfg.show_cube === false ? "none" : "";
+    if (logo) logo.style.display = cfg.show_logo === false ? "none" : "";
+    if (code) code.style.display = cfg.show_code === false ? "none" : "";
+    if (bar) bar.style.display = cfg.show_progress_bar === false ? "none" : "";
+    if (textEl) textEl.style.display = cfg.show_text === false ? "none" : "";
+
+    if (logo && cfg.logo_url) {
+      const img = logo.querySelector("img");
+      if (img) {
+        img.src = cfg.logo_url;
+        img.alt = "Logo";
+      }
+    }
+
+    if (code && (cfg.code_line_1 || cfg.code_line_2)) {
+      const lines = code.querySelectorAll(".code-line");
+      if (lines[0] && cfg.code_line_1 != null) lines[0].innerHTML = escapeCodeLine(cfg.code_line_1);
+      if (lines[1] && cfg.code_line_2 != null) lines[1].innerHTML = escapeCodeLine(cfg.code_line_2);
+    }
+
+    if (textEl) {
+      const label = pickLangText(cfg.loading_text) || pickLangText(DEFAULTS.loading_text) || "Initializing";
+      textEl.innerHTML = `${escapeHtml(label)}<span class="dots">...</span>`;
+    }
+
+    if (cfg.custom_css && String(cfg.custom_css).trim()) {
+      let styleEl = document.getElementById("preloader-custom-css");
+      if (!styleEl) {
+        styleEl = document.createElement("style");
+        styleEl.id = "preloader-custom-css";
+        document.head.appendChild(styleEl);
+      }
+      styleEl.textContent = String(cfg.custom_css);
+    }
+
+    preloader.querySelectorAll(".cube-face").forEach((f) => {
+      f.style.borderColor = cfg.accent_color || DEFAULTS.accent_color;
+    });
+    const fill = preloader.querySelector(".preloader-bar-fill");
+    if (fill) {
+      const a = cfg.accent_color || DEFAULTS.accent_color;
+      fill.style.background = `linear-gradient(90deg, ${a}, ${a})`;
+      fill.style.boxShadow = `0 0 12px ${a}88`;
+    }
+
+    return true;
+  }
+
+  const start = performance.now();
+  let minTime = DEFAULTS.min_duration_ms;
+  let settingsApplied = false;
+  let pageLoaded = document.readyState === "complete";
+  let hideScheduled = false;
+
+  function tryHide() {
+    if (hideScheduled) return;
+    if (!settingsApplied || !pageLoaded) return;
+    hideScheduled = true;
+    const elapsed = performance.now() - start;
+    const wait = Math.max(0, minTime - elapsed);
+    setTimeout(() => {
+      preloader.classList.add("is-done");
+      document.body.classList.remove("is-loading");
+      setTimeout(() => {
+        try { preloader.remove(); } catch (_) {}
+        const styleEl = document.getElementById("preloader-custom-css");
+        if (styleEl) styleEl.remove();
+      }, 700);
+    }, wait);
+  }
+
+  async function loadSettings() {
+    try {
+      const client =
+        typeof window.supabase !== "undefined" &&
+        typeof SUPABASE_URL !== "undefined" &&
+        typeof SUPABASE_ANON_KEY !== "undefined"
+          ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+          : null;
+      if (!client) {
+        applySettings(DEFAULTS);
+        settingsApplied = true;
+        tryHide();
+        return;
+      }
+      const { data, error } = await client
+        .from("preloader_settings")
+        .select("*")
+        .limit(1)
+        .maybeSingle();
+      if (error || !data) {
+        applySettings(DEFAULTS);
+      } else {
+        const enabled = applySettings(data);
+        if (!enabled) return;
+        minTime = Math.max(0, Number(data.min_duration_ms) || DEFAULTS.min_duration_ms);
+      }
+    } catch (e) {
+      console.warn("[Preloader] Could not load settings, using defaults", e);
+      applySettings(DEFAULTS);
+    }
+    settingsApplied = true;
+    tryHide();
+  }
+
+  if (!pageLoaded) {
+    window.addEventListener(
+      "load",
+      () => {
+        pageLoaded = true;
+        tryHide();
+      },
+      { once: true }
+    );
+  }
+
+  loadSettings();
+})();
+
 /* =========================================================
    Real tech logos (inline SVG, official brand colors)
 ========================================================= */
