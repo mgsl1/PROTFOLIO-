@@ -1035,8 +1035,9 @@ html[data-theme="light"] .ai-chat-widget.is-open .ai-fab-bubble{
   position:absolute;
   bottom:calc(64px + 14px);
   right:0;
-  width:min(380px, calc(100% - 32px));
-  max-width:calc(100% - 32px);
+  /* Use viewport width (safe now that html/body have overflow-x:hidden) */
+  width:min(380px, calc(100vw - 32px));
+  max-width:min(380px, calc(100vw - 32px));
   height:min(560px, calc(100vh - 120px));
   background:var(--bg-elev);
   border:1px solid var(--border);
@@ -1297,8 +1298,8 @@ html[data-theme="light"] .ai-chat-input-row input{ background:#f7f7f9; }
   .ai-chat-widget{ bottom:16px; right:16px; }
   html[dir="rtl"] .ai-chat-widget{ left:16px; right:auto; }
   .ai-chat-panel{
-    width:calc(100% - 24px);
-    max-width:calc(100% - 24px);
+    width:calc(100vw - 24px);
+    max-width:calc(100vw - 24px);
     height:min(70vh, calc(100vh - 100px));
     bottom:calc(64px + 10px);
   }
