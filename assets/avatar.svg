@@ -1,0 +1,110 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a150e"/>
+      <stop offset="55%" stop-color="#120e09"/>
+      <stop offset="100%" stop-color="#0a0806"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="72%" cy="22%" r="55%">
+      <stop offset="0%" stop-color="#ffd75e" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ffd75e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="18%" cy="88%" r="45%">
+      <stop offset="0%" stop-color="#a9700f" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#a9700f" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a9700f"/>
+      <stop offset="55%" stop-color="#e0a526"/>
+      <stop offset="100%" stop-color="#ffd75e"/>
+    </linearGradient>
+    <linearGradient id="skinGrad" x1="30%" y1="0%" x2="75%" y2="100%">
+      <stop offset="0%" stop-color="#c68a5c"/>
+      <stop offset="100%" stop-color="#a3653c"/>
+    </linearGradient>
+    <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3a2a1c"/>
+      <stop offset="100%" stop-color="#1c130c"/>
+    </linearGradient>
+    <linearGradient id="shirtGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#241d15"/>
+      <stop offset="100%" stop-color="#171310"/>
+    </linearGradient>
+    <clipPath id="circleClip">
+      <circle cx="600" cy="420" r="248"/>
+    </clipPath>
+  </defs>
+
+  <!-- background card -->
+  <rect x="0" y="0" width="1200" height="800" fill="url(#bgGrad)"/>
+  <rect x="0" y="0" width="1200" height="800" fill="url(#glow)"/>
+  <rect x="0" y="0" width="1200" height="800" fill="url(#glow2)"/>
+
+  <!-- decorative dotted ring accents -->
+  <circle cx="600" cy="420" r="288" fill="none" stroke="#ffd77a1c" stroke-width="1.5" stroke-dasharray="2 10"/>
+
+  <!-- avatar ring -->
+  <circle cx="600" cy="420" r="262" fill="url(#ringGrad)" opacity="0.9"/>
+  <circle cx="600" cy="420" r="252" fill="#14100a"/>
+
+  <g clip-path="url(#circleClip)">
+    <!-- head/neck base -->
+    <rect x="352" y="0" width="496" height="800" fill="url(#skinGrad)"/>
+
+    <!-- shoulders / shirt -->
+    <path d="M370 620 Q600 520 830 620 L830 700 Q600 640 370 700 Z" fill="url(#shirtGrad)"/>
+    <path d="M370 620 Q600 520 830 620 L830 645 Q600 555 370 645 Z" fill="#ffd75e" opacity="0.14"/>
+
+    <!-- hair top -->
+    <path d="M425 350
+             C420 240 490 175 600 175
+             C710 175 780 240 775 350
+             C775 300 740 260 700 245
+             C700 275 690 300 665 300
+             L535 300
+             C510 300 500 275 500 245
+             C460 260 425 300 425 350 Z" fill="url(#hairGrad)"/>
+
+    <!-- sideburns -->
+    <path d="M472 300 C460 318 454 350 458 385 L474 388 C470 352 470 322 480 300 Z" fill="url(#hairGrad)"/>
+    <path d="M728 300 C740 318 746 350 742 385 L726 388 C730 352 730 322 720 300 Z" fill="url(#hairGrad)"/>
+
+    <!-- eyebrows -->
+    <path d="M498 388 Q525 372 555 385" stroke="#1c130c" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <path d="M645 385 Q675 372 702 388" stroke="#1c130c" stroke-width="10" fill="none" stroke-linecap="round"/>
+
+    <!-- eyes -->
+    <ellipse cx="528" cy="412" rx="17" ry="11" fill="#241a12"/>
+    <ellipse cx="672" cy="412" rx="17" ry="11" fill="#241a12"/>
+    <circle cx="524" cy="409" r="3" fill="#f5f1e8" opacity="0.7"/>
+    <circle cx="668" cy="409" r="3" fill="#f5f1e8" opacity="0.7"/>
+
+    <!-- nose -->
+    <path d="M596 400 Q586 445 596 460 Q605 468 616 460" stroke="#8a5636" stroke-width="7" fill="none" stroke-linecap="round" opacity="0.75"/>
+
+    <!-- beard (full, smooth) -->
+    <path d="M452 400
+             C448 480 460 560 510 615
+             C545 653 575 668 600 668
+             C625 668 655 653 690 615
+             C740 560 752 480 748 400
+             L728 400
+             C726 460 712 515 683 555
+             C665 490 640 478 600 478
+             C560 478 535 490 517 555
+             C488 515 474 460 472 400 Z" fill="url(#hairGrad)"/>
+
+    <!-- mustache -->
+    <path d="M548 468 Q575 452 600 460 Q625 452 652 468 Q625 480 600 476 Q575 480 548 468 Z" fill="url(#hairGrad)"/>
+
+    <!-- mouth hint -->
+    <path d="M580 500 Q600 510 620 500" stroke="#3a2418" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.6"/>
+  </g>
+
+  <!-- soft outer glow ring -->
+  <circle cx="600" cy="420" r="252" fill="none" stroke="#00000060" stroke-width="10"/>
+
+  <!-- small accent badge -->
+  <circle cx="812" cy="612" r="34" fill="#14100a" stroke="url(#ringGrad)" stroke-width="3"/>
+  <path d="M800 612 l8 8 16 -18" stroke="#ffd75e" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
