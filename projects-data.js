@@ -980,6 +980,106 @@ const LOCAL_PROJECTS = [
     ]
   },
   {
+      "id": "edupro-learning",
+      "featured": false,
+      "year": "2026",
+      "badge": {
+          "ar": "منصة تعليمية",
+          "fr": "Plateforme éducative",
+          "en": "E-Learning App"
+      },
+      "likes_count": 1370,
+      "demo_url": "",
+      "categories": [
+          "mobile"
+      ],
+      "technologies": [
+          "Mobile App",
+          "E-Learning",
+          "Education",
+          "Online Courses",
+          "Live Streaming",
+          "Video Lessons",
+          "Quizzes",
+          "Certificates",
+          "Arabic RTL"
+      ],
+      "title": {
+          "ar": "EduPro — منصة تعليمية متكاملة بدورات وبث مباشر واختبارات وشهادات",
+          "fr": "EduPro — Plateforme d'apprentissage complète avec cours, directs, quiz et certificats",
+          "en": "EduPro — Complete Learning Platform with Courses, Live Streams, Quizzes & Certificates"
+      },
+      "short_description": {
+          "ar": "تطبيق تعليمي بالعربية بهوية برتقالية: دورات بالفيديو، بث مباشر مع دردشة، اختبارات بمؤقّت، شهادات إتمام، وملف شخصي بالإنجازات والإحصائيات.",
+          "fr": "Application d'apprentissage en arabe à l'identité orange : cours vidéo, directs avec chat, quiz chronométrés, certificats et profil avec réussites et statistiques.",
+          "en": "An Arabic learning app with an orange identity: video courses, live streams with chat, timed quizzes, completion certificates, and a profile with achievements and stats."
+      },
+      "full_description": {
+          "ar": "EduPro («تعلّم · اكتشف · انجح») منصة تعليمية متكاملة بواجهة عربية وهوية برتقالية دافئة وشعار قبعة تخرّج. تبدأ بشاشة تحميل ثم شاشة ترحيب بتسجيل الدخول أو إنشاء حساب أو المتابعة عبر جوجل وآبل. تعرض الصفحة الرئيسية تحية للطالب وبانر «بث مباشر الآن» وأقسام المنصة (البرمجة، اللغات، العلوم) ودورات مقترحة. وتضم شاشة الدورات بحثاً وتصفية حسب الفئة مع التقييم وعدد الطلاب، ويقدّم مشغّل الدروس فيديو بتبويبات للأسئلة والملفات والملاحظات وزر «الدرس التالي». ويدعم التطبيق البث المباشر مع دردشة المشاركين، واختبارات بأسئلة متعددة الخيارات ومؤقّت زمني (15 دقيقة). أما الملف الشخصي فيعرض مستوى الطالب وعدد الدورات المكتملة وساعات التعلّم ونسبة التقدّم والأوسمة وإحصائيات التعلّم، مع صفحة «شهاداتي» لتحميل شهادة إتمام الدورة، وإعدادات للإشعارات واللغة والمظهر والخصوصية والدعم.",
+          "fr": "EduPro (« Apprends · Explore · Réussis ») est une plateforme d'apprentissage complète à l'interface arabe et à l'identité orange chaleureuse, avec un logo en forme de toque de diplômé. Elle commence par un écran de chargement puis un écran d'accueil (connexion, création de compte, Google et Apple). L'accueil salue l'étudiant et propose une bannière « En direct maintenant », les rubriques (programmation, langues, sciences) et des cours suggérés. L'écran des cours offre recherche et filtres par catégorie avec note et nombre d'étudiants ; le lecteur de leçons propose la vidéo, des onglets questions, fichiers et notes, et un bouton « Leçon suivante ». L'application gère aussi les directs avec chat des participants et des quiz à choix multiples chronométrés (15 minutes). Le profil affiche le niveau, les cours terminés, les heures d'apprentissage, la progression, les badges et des statistiques, avec une page « Mes certificats » pour télécharger l'attestation de réussite, et des paramètres (notifications, langue, apparence, confidentialité, aide).",
+          "en": "EduPro (“Learn · Explore · Succeed”) is a complete learning platform with an Arabic interface, a warm orange identity and a graduation-cap logo. It opens with a splash screen and a welcome screen (sign in, create account, Google and Apple). The home screen greets the student and shows a “Live now” banner, platform categories (programming, languages, science) and suggested courses. The courses screen offers search and category filters with ratings and student counts, and the lesson player combines video with tabs for questions, files and notes plus a “Next lesson” button. The app also supports live streams with participant chat and timed multiple-choice quizzes (15 minutes). The profile shows the student's level, completed courses, learning hours, progress, badges and learning stats, with a “My certificates” page to download a course completion certificate, and settings for notifications, language, appearance, privacy and support."
+      },
+      "problem": {
+          "ar": "المتعلّم العربي يتنقّل بين تطبيقات للدروس المسجّلة وأخرى للبث المباشر وثالثة للاختبارات، ولا يملك مكاناً واحداً يتابع فيه تقدّمه ويحصل على شهادة.",
+          "fr": "L'apprenant jongle entre des applications pour les cours enregistrés, les directs et les tests, sans lieu unique pour suivre sa progression et obtenir un certificat.",
+          "en": "Arabic-speaking learners switch between apps for recorded lessons, live classes and tests, with no single place to track progress and earn a certificate."
+      },
+      "solution": {
+          "ar": "منصة واحدة بالعربية تجمع الدورات المصوّرة والبث المباشر والاختبارات والشهادات، مع ملف شخصي يعرض التقدّم والإنجازات ليبقى المتعلّم متحمّساً.",
+          "fr": "Une seule plateforme en arabe réunissant cours vidéo, directs, quiz et certificats, avec un profil qui montre la progression et les réussites pour garder l'élève motivé.",
+          "en": "A single Arabic platform that brings video courses, live classes, quizzes and certificates together, with a profile showing progress and achievements to keep learners motivated."
+      },
+      "features": {
+          "ar": [
+              "شاشة تحميل وترحيب بهوية برتقالية",
+              "تسجيل الدخول وإنشاء حساب أو عبر جوجل وآبل",
+              "صفحة رئيسية بتحية وبانر البث المباشر ودورات مقترحة",
+              "أقسام: البرمجة، اللغات، العلوم وغيرها",
+              "بحث في الدورات وتصفية بالفئة مع التقييم وعدد الطلاب",
+              "مشغّل دروس بالفيديو مع تبويبات الأسئلة والملفات والملاحظات",
+              "بث مباشر مع دردشة المشاركين",
+              "اختبارات متعددة الخيارات بمؤقّت زمني",
+              "ملف شخصي بالمستوى والإنجازات والأوسمة والإحصائيات",
+              "شهادة إتمام الدورة قابلة للتحميل",
+              "إعدادات الإشعارات واللغة والمظهر والخصوصية والدعم"
+          ],
+          "fr": [
+              "Écrans de chargement et d'accueil à l'identité orange",
+              "Connexion, inscription, Google et Apple",
+              "Accueil avec salutation, bannière de direct et cours suggérés",
+              "Rubriques : programmation, langues, sciences et plus",
+              "Recherche et filtres de cours avec note et nombre d'étudiants",
+              "Lecteur vidéo avec onglets questions, fichiers et notes",
+              "Directs avec chat des participants",
+              "Quiz à choix multiples chronométrés",
+              "Profil : niveau, réussites, badges et statistiques",
+              "Certificat de réussite téléchargeable",
+              "Paramètres : notifications, langue, apparence, confidentialité, aide"
+          ],
+          "en": [
+              "Splash and welcome screens in an orange identity",
+              "Sign-in, sign-up, Google and Apple",
+              "Home with greeting, live banner and suggested courses",
+              "Categories: programming, languages, science and more",
+              "Course search and category filters with ratings and student counts",
+              "Video lesson player with questions, files and notes tabs",
+              "Live streams with participant chat",
+              "Timed multiple-choice quizzes",
+              "Profile with level, achievements, badges and learning stats",
+              "Downloadable course completion certificate",
+              "Settings for notifications, language, appearance, privacy and support"
+          ]
+      },
+      "cover_image_url": "assets/projects/edupro/cover.webp",
+      "thumbnail_url": "assets/projects/edupro/cover.webp",
+      "gallery": [
+          "assets/projects/edupro/cover.webp",
+          "assets/projects/edupro/home-live.webp",
+          "assets/projects/edupro/courses-lesson-quiz.webp",
+          "assets/projects/edupro/profile-certificate.webp"
+      ]
+  },
+  {
     "id": "pixstube",
     "featured": false,
     "year": "2026",
@@ -1714,6 +1814,98 @@ const LOCAL_PROJECTS = [
           "assets/projects/rihlaty/cover.webp",
           "assets/projects/rihlaty/intro.webp",
           "assets/projects/rihlaty/auth.webp"
+      ]
+  },
+  {
+      "id": "penguchat-messaging",
+      "featured": false,
+      "year": "2026",
+      "badge": {
+          "ar": "تطبيق مراسلة",
+          "fr": "Application de messagerie",
+          "en": "Messaging App"
+      },
+      "likes_count": 1290,
+      "demo_url": "",
+      "categories": [
+          "mobile"
+      ],
+      "technologies": [
+          "Mobile App",
+          "Real-time Chat",
+          "Google Sign-In",
+          "Email Auth",
+          "Marketplace",
+          "Voice-to-Text"
+      ],
+      "title": {
+          "ar": "PenguChat — تطبيق مراسلة فورية مع نشر المنتجات والخدمات",
+          "fr": "PenguChat — Application de messagerie instantanée avec publication de produits et services",
+          "en": "PenguChat — Real-time Messaging App with Products & Services Marketplace"
+      },
+      "short_description": {
+          "ar": "تطبيق مراسلة بشخصية البطريق: دردشة فورية، تسجيل بجوجل أو البريد، بحث عن مستخدم بالاسم، ونشر المنتجات والخدمات للتواصل مع الناشر.",
+          "fr": "Application de messagerie à la mascotte pingouin : chat en temps réel, inscription Google ou e-mail, recherche d'utilisateur et publication de produits et services.",
+          "en": "A penguin-themed messaging app: real-time chat, Google or email sign-up, user search by username, and publishing products and services to contact the seller."
+      },
+      "full_description": {
+          "ar": "PenguChat تطبيق مراسلة متكامل بهوية بيج هادئة وشخصية بطريق لطيفة. يتيح التسجيل عبر جوجل أو البريد الإلكتروني مع صفحة لرفع الصورة الشخصية وتعديل البيانات، وشاشة دخول بخيار «تذكرني». من قائمة المحادثات يمكن فتح الشريط الجانبي لتصفح المحتوى وتعديل الملف الشخصي، والبحث عن مستخدم آخر باسمه وبدء محادثة معه. يدعم التطبيق الرسائل الفورية ومشاركة الصور والفيديوهات والملفات وجدولة الرسائل للإرسال لاحقاً، مع تحويل الصوت إلى نص. وعبر زر «+» يمكن نشر منتج أو خدمة (اسم ووصف وصور) أو تصفح المنتجات والخدمات، ثم مراسلة الناشر مباشرة من صفحة المنتج.",
+          "fr": "PenguChat est une application de messagerie complète à l'identité beige apaisante et à la mascotte pingouin. L'inscription se fait via Google ou e-mail, suivie d'une page pour ajouter une photo de profil et modifier ses informations, avec un écran de connexion et l'option « Se souvenir de moi ». Depuis la liste des discussions, le menu latéral permet d'explorer le contenu et de modifier son profil, et la recherche permet de trouver un utilisateur par son nom pour démarrer une conversation. L'application gère les messages en temps réel, le partage d'images, de vidéos et de fichiers, la programmation d'envoi et la conversion de la voix en texte. Le bouton « + » permet de publier un produit ou un service (nom, description, images) ou de parcourir les annonces, puis de contacter directement le vendeur depuis la fiche.",
+          "en": "PenguChat is a complete messaging app with a calm beige identity and a friendly penguin mascot. Users sign up with Google or email, then land on a page to upload a profile picture and edit their details, with a login screen and a “Remember me” option. From the chats list, the sidebar lets them explore the app and edit their profile, and a search finds another user by username to start a conversation. The app supports real-time messages, sharing images, videos and files, scheduled messages for later delivery, and voice-to-text conversion. The “+” button lets users publish a product or service (name, description, images) or browse listings, then message the publisher directly from the product page."
+      },
+      "problem": {
+          "ar": "المراسلة والتسويق للمنتجات والخدمات غالباً ما يكونان في تطبيقين منفصلين، فيضيع الزبون بين البحث عن البائع ومحاولة التواصل معه.",
+          "fr": "La messagerie et la promotion de produits ou services se font souvent dans des applications séparées, ce qui complique la prise de contact avec le vendeur.",
+          "en": "Messaging and promoting products or services usually live in separate apps, which makes it harder for buyers to find and reach the seller."
+      },
+      "solution": {
+          "ar": "تطبيق واحد يجمع الدردشة الفورية مع قسم لنشر المنتجات والخدمات، بحيث تبدأ المحادثة مع الناشر بضغطة واحدة من صفحة المنتج.",
+          "fr": "Une seule application qui réunit le chat en temps réel et une section de publication de produits et services : la conversation avec le vendeur démarre en un clic depuis la fiche.",
+          "en": "One app that combines real-time chat with a products and services section, so a conversation with the publisher starts in a single tap from the product page."
+      },
+      "features": {
+          "ar": [
+              "التسجيل عبر جوجل أو البريد الإلكتروني",
+              "صفحة رفع الصورة الشخصية وتعديل البيانات",
+              "تسجيل الدخول مع خيار «تذكرني»",
+              "قائمة المحادثات مع شريط جانبي",
+              "البحث عن مستخدم بالاسم وبدء محادثة",
+              "رسائل فورية ومشاركة الصور والفيديوهات والملفات",
+              "جدولة الرسائل وتحويل الصوت إلى نص",
+              "نشر منتج أو خدمة بالاسم والوصف والصور",
+              "تصفح المنتجات والخدمات ومراسلة الناشر مباشرة"
+          ],
+          "fr": [
+              "Inscription via Google ou e-mail",
+              "Page de photo de profil et de modification des informations",
+              "Connexion avec option « Se souvenir de moi »",
+              "Liste des discussions avec menu latéral",
+              "Recherche d'utilisateur par nom et début de conversation",
+              "Messages en temps réel, partage d'images, vidéos et fichiers",
+              "Messages programmés et conversion voix-texte",
+              "Publication de produit ou service (nom, description, images)",
+              "Parcours des annonces et message direct au vendeur"
+          ],
+          "en": [
+              "Sign-up with Google or email",
+              "Profile picture upload and personal details page",
+              "Login with a “Remember me” option",
+              "Chats list with a sidebar",
+              "Search users by username and start a conversation",
+              "Real-time messages, image, video and file sharing",
+              "Scheduled messages and voice-to-text",
+              "Publish a product or service with name, description and images",
+              "Browse listings and message the publisher directly"
+          ]
+      },
+      "cover_image_url": "assets/projects/penguchat/cover.webp",
+      "thumbnail_url": "assets/projects/penguchat/cover.webp",
+      "gallery": [
+          "assets/projects/penguchat/cover.webp",
+          "assets/projects/penguchat/signup.webp",
+          "assets/projects/penguchat/communicate.webp",
+          "assets/projects/penguchat/publish.webp",
+          "assets/projects/penguchat/contact.webp"
       ]
   }
 ];

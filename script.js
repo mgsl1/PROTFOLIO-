@@ -706,6 +706,26 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
   const closeBtn = document.getElementById('aiChatClose');
   const clearBtn = document.getElementById('aiChatClear');
   const suggestionsEl = document.getElementById('aiChatSuggestions');
+  // Suggestions are one horizontal row: mouse wheel and click-drag scroll it sideways (touch scrolls natively)
+  if (suggestionsEl) {
+    suggestionsEl.addEventListener('wheel', (e) => {
+      if (suggestionsEl.scrollWidth <= suggestionsEl.clientWidth) return;
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { suggestionsEl.scrollLeft += e.deltaY; e.preventDefault(); }
+    }, { passive: false });
+    let dragX = null, startLeft = 0, moved = false;
+    suggestionsEl.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      dragX = e.clientX; startLeft = suggestionsEl.scrollLeft; moved = false;
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (dragX === null) return;
+      const dx = e.clientX - dragX;
+      if (Math.abs(dx) > 4) { moved = true; suggestionsEl.classList.add('is-dragging'); }
+      if (moved) suggestionsEl.scrollLeft = startLeft - dx;
+    });
+    window.addEventListener('pointerup', () => { dragX = null; setTimeout(() => suggestionsEl.classList.remove('is-dragging'), 0); });
+    suggestionsEl.addEventListener('click', (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+  }
   if (!widget || !fab || !panel) {
     console.warn('[AI Chat] Widget elements not found in DOM');
     return;
@@ -756,7 +776,7 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
     en: {
       status: 'Online · AI Assistant',
       placeholder: 'Ask me anything about the site…',
-      greeting: "Hello! I'm Mohamed Abdo, the developer. Ask me anything — projects (Cisterna, Wasla, Mawsoul…), services, Flutter, real-time systems, tech stack, pricing, availability, process, or how we can work together.",
+      greeting: "Hello! I'm Mohamed Abdo, the developer. Ask me anything — projects (Cisterna, Wasla, Mawsoul, EduPro…), services, Flutter, real-time systems, tech stack, pricing, availability, process, or how we can work together.",
       suggestions: [
         'What services do you offer?',
         'How can I contact you?',
@@ -771,7 +791,7 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
     fr: {
       status: 'En ligne · Assistant IA',
       placeholder: 'Posez-moi n’importe quelle question…',
-      greeting: "Bonjour ! Je suis Mohamed Abdo, le développeur. Posez toutes vos questions — projets (Cisterna, Wasla, Mawsoul…), services, Flutter, systèmes temps réel, stack technique, budget, disponibilité, process, ou collaboration.",
+      greeting: "Bonjour ! Je suis Mohamed Abdo, le développeur. Posez toutes vos questions — projets (Cisterna, Wasla, Mawsoul, EduPro…), services, Flutter, systèmes temps réel, stack technique, budget, disponibilité, process, ou collaboration.",
       suggestions: [
         'Quels services offrez-vous ?',
         'Comment vous contacter ?',
@@ -786,7 +806,7 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
     ar: {
       status: 'متصل · مساعد ذكي',
       placeholder: 'اسألني عن أي شيء يخص الموقع…',
-      greeting: 'مرحباً! أنا المطور محمد عبدو. اسأل عن أي شيء — المشاريع (Cisterna، Wasla, Mawsoul…)، الخدمات، Flutter، الأنظمة الحية، التقنيات، الأسعار، التوفر، طريقة العمل، أو كيف نبدأ معاً.',
+      greeting: 'مرحباً! أنا المطور محمد عبدو. اسأل عن أي شيء — المشاريع (Cisterna، Wasla، Mawsoul، EduPro…)، الخدمات، Flutter، الأنظمة الحية، التقنيات، الأسعار، التوفر، طريقة العمل، أو كيف نبدأ معاً.',
       suggestions: [
         'ما هي خدماتك؟',
         'كيف أتواصل معك؟',
@@ -1121,7 +1141,7 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
       return (typeof LOCAL_PROJECTS !== 'undefined' && Array.isArray(LOCAL_PROJECTS)) ? LOCAL_PROJECTS : [];
     }
     function arNorm(str) {
-      return String(str || '').toLowerCase()
+      return String(str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
         .replace(/[\u064B-\u065F\u0670\u0640]/g, '')
         .replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه')
         .replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim();
@@ -1153,12 +1173,18 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
       'nova-pet': ['nova pet', 'novapet', 'نوفا بت', 'pet shop', 'pet store', 'حيوانات اليفة', 'animaux'],
       'novamart-store': ['novamart', 'nova mart', 'نوفا مارت'],
       'alnajjar-app': ['al najjar', 'alnajjar', 'najjar', 'النجار', 'نجار', 'menuiserie', 'carpentry'],
-      'rihlaty-app': ['rihlaty', 'rihlati', 'رحلتي']
+      'rihlaty-app': ['rihlaty', 'rihlati', 'رحلتي'],
+      'penguchat-messaging': ['penguchat', 'pengu chat', 'pengu', 'بنغوتشات', 'بينغو شات', 'messaging app', 'تطبيق مراسله', 'تطبيق مراسلة'],
+      'edupro-learning': ['edupro', 'edu pro', 'ايديو برو', 'اديو برو', 'ايدو برو', 'e learning', 'elearning', 'منصه تعليميه', 'plateforme educative', 'educational platform']
     };
     function projectAliases(p) {
       const set = new Set();
       ['ar', 'fr', 'en'].forEach((l) => { const n = arNorm(shortName(p, l)); if (n.length >= 3) set.add(n); });
       (PROJECT_ALIASES[p.id] || []).forEach((a) => { const n = arNorm(a); if (n.length >= 3) set.add(n); });
+      // auto aliases from the id (e.g. "edupro-learning" -> "edupro", "edupro learning") so new projects work without editing this file
+      const idParts = String(p.id || '').toLowerCase().split('-').filter(Boolean);
+      if (idParts[0] && idParts[0].length >= 4) set.add(idParts[0]);
+      if (idParts.length > 1) set.add(idParts.join(' '));
       return [...set];
     }
     function hasAlias(nq, alias) {
@@ -1195,6 +1221,51 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
         : 'Type any project name (e.g. Mawsoul, Cisterna, Wasla) for the full details.';
       return head + '\n\n' + listLines(all, lang) + '\n\n' + foot;
     }
+    /* ---- Topic search: finds projects by what they ARE (education, chat, delivery, store, gym…) ---- */
+    const TOPIC_STOP = new Set(('the and for with you your are have has does did what which who how can could would should about from that this there their them they any all some many much more most other into your app apps application applications mobile project projects projet projets website websites site sites dashboard dashboards platform platforms work works worked built build make made show tell please price prices pricing cost quote service services contact hire available availability developer develop development portfolio example examples ' +
+      'des les une pour avec vous votre est sont avez avoir quel quelle quels quelles comment peut peux plus autre tout tous toutes sur dans que qui quoi ' +
+      'هل عندك لديك لدي كيف ماذا ماهو ماهي اين متى لماذا عن على في من الى الي مع هذا هذه ذلك التي الذي كل جميع بعض اي ايضا فقط تطبيق تطبيقات مشروع مشاريع موقع مواقع لوحه لوحات منصه اعمال اعمالك سعر اسعار تكلفه خدمات خدمه تواصل').split(' '));
+    function topicTokens(nq) {
+      const pre = /^(?:وال|بال|لل|فال|كال|ال)/;
+      return [...new Set(nq.split(' ').map((w) => (w.length > 4 ? w.replace(pre, '') : w)).filter((w) => w.length >= 4 && !TOPIC_STOP.has(w)))];
+    }
+    function projectHeadWords(p) {
+      const parts = [];
+      ['ar', 'fr', 'en'].forEach((l) => { parts.push(i18nField(p.title, l), i18nField(p.badge, l)); });
+      return arNorm(parts.join(' ')).split(' ').filter(Boolean);
+    }
+    function projectWords(p) {
+      const parts = [];
+      ['ar', 'fr', 'en'].forEach((l) => { parts.push(i18nField(p.title, l), i18nField(p.short_description, l), i18nField(p.badge, l)); });
+      (p.technologies || []).forEach((t) => parts.push(typeof t === 'string' ? t : (t && t.name) || ''));
+      (p.categories || []).forEach((c) => parts.push(c));
+      return arNorm(parts.join(' ')).split(' ').filter(Boolean);
+    }
+    function wordMatches(tok, word) {
+      if (tok === word) return true;
+      if (tok.length >= 5 && word.length >= 5) return word.startsWith(tok.slice(0, 5)) || tok.startsWith(word.slice(0, 5));
+      return false;
+    }
+    function topicSearch(nq, wide) {
+      const all = getAllProjects();
+      const toks = topicTokens(nq);
+      if (!toks.length || !all.length) return [];
+      const words = all.map(projectWords);
+      const heads = all.map(projectHeadWords);
+      const maxDf = wide ? 8 : 4;
+      const scored = all.map((p, i) => ({ p, score: 0 }));
+      toks.forEach((tok) => {
+        const matched = words.map((ws) => ws.some((w) => wordMatches(tok, w)));
+        const df = matched.filter(Boolean).length;
+        if (!df || df > maxDf) return; // unknown or too generic to be meaningful
+        matched.forEach((m, i) => {
+          if (!m) return;
+          scored[i].score += 1 / df;
+          if (heads[i].some((w) => wordMatches(tok, w))) scored[i].score += 1; // title/badge match ranks first
+        });
+      });
+      return scored.filter((x) => x.score > 0).sort((a, b) => b.score - a.score).map((x) => x.p);
+    }
     const CATEGORY_INTENTS = [
       { slug: 'ecommerce', re: /e-?commerce|\bstores?\b|\bshops?\b|boutique|متجر|متاجر|تجاره|تجارة/, ar: 'المتاجر الإلكترونية', fr: 'les boutiques en ligne', en: 'online stores' },
       { slug: 'dashboard', re: /dashboard|admin|tableau|لوحه|لوحة|لوحات|تحكم/, ar: 'لوحات التحكم', fr: 'les tableaux de bord', en: 'dashboards' },
@@ -1228,6 +1299,13 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
         }
         // (c) all projects / how many
         if (wantsAll) return listAllReply();
+      }
+      // (d) by topic / keywords: "education app", "chat app", "do you have a delivery project?"…
+      const found = topicSearch(nq, projectWord).slice(0, 5);
+      if (found.length) {
+        if (found.length <= 2) return found.map((p) => buildProjectReply(p, lang)).join('\n\n———\n\n');
+        const head = isAr ? 'هذه أقرب ' + found.length + ' مشاريع لما تبحث عنه:' : isFr ? 'Voici les ' + found.length + ' projets les plus proches :' : 'Here are the ' + found.length + ' closest projects:';
+        return head + '\n\n' + listLines(found, lang) + '\n\n' + (isAr ? 'اكتب اسم أحدها للتفاصيل الكاملة.' : isFr ? 'Écrivez le nom de l’un d’eux pour le détail.' : 'Type one name for the full details.');
       }
       return null;
     }
@@ -1450,9 +1528,9 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
     if (match(
       /cv|resume|curriculum|سيرة|تحميل|download|portfolio|ملف/
     )) {
-      if (isAr) return 'يمكنك تحميل الـ CV من الزر الموجود في قسم الـ Hero أعلى الصفحة.\nكما أن هذا الموقع نفسه هو الـ Portfolio الخاص بي — كل المشاريع والخدمات موضحة هنا.';
-      if (isFr) return 'Vous pouvez télécharger mon CV via le bouton dans la section Hero en haut de la page.\nCe site est également mon portfolio — tous les projets et services y sont présentés.';
-      return 'You can download my CV from the button in the Hero section at the top of the page.\nThis website itself is my portfolio — all projects and services are presented here.';
+      if (isAr) return 'لاستلام السيرة الذاتية (CV) راسلني على لينكد إن وسأرسلها لك شخصيًا:\nhttps://www.linkedin.com/in/mohamed-abdo-667a0b335\nكما أن هذا الموقع نفسه هو الـ Portfolio الخاص بي — كل المشاريع والخدمات موضحة هنا.';
+      if (isFr) return 'Pour recevoir mon CV, envoyez-moi un message sur LinkedIn et je vous le transmettrai personnellement :\nhttps://www.linkedin.com/in/mohamed-abdo-667a0b335\nCe site est également mon portfolio — tous les projets et services y sont présentés.';
+      return 'To receive my CV, send me a message on LinkedIn and I’ll share it with you personally:\nhttps://www.linkedin.com/in/mohamed-abdo-667a0b335\nThis website itself is my portfolio — all projects and services are presented here.';
     }
 
     /* ---------- Future / What’s next / Roadmap ---------- */
