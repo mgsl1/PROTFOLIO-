@@ -1096,7 +1096,7 @@ function openProjectModal(p) {
               <button type="button" class="pm-thumb${i === 0 ? " active" : ""}" data-idx="${i}">
                 ${g.type === "video"
                   ? `<span class="pm-thumb-video">🎬</span>`
-                  : `<img src="${escHtml(g.url)}" alt="">`}
+                  : `<img src="${escHtml(g.url)}" alt="" loading="lazy" decoding="async">`}
               </button>
             `).join("")}
           </div>

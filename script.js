@@ -4,6 +4,14 @@
   const preloader = document.getElementById("preloader");
   if (!preloader) return;
 
+  /* Instant load: preloader disabled (set to true to bring the intro animation back) */
+  const PRELOADER_ENABLED = false;
+  if (!PRELOADER_ENABLED) {
+    try { preloader.remove(); } catch (_) {}
+    document.body.classList.remove("is-loading");
+    return;
+  }
+
   document.body.classList.add("is-loading");
 
   const DEFAULTS = {

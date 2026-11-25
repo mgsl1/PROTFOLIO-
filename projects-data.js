@@ -20,6 +20,148 @@ const LOCAL_CATEGORIES = [
 
 const LOCAL_PROJECTS = [
   {
+      "id": "nova-pass-card",
+      "featured": false,
+      "year": "2026",
+      "badge": {
+          "ar": "موقع تعريفي",
+          "fr": "Site vitrine",
+          "en": "Showcase Website"
+      },
+      "likes_count": 1410,
+      "demo_url": "",
+      "categories": [
+          "website"
+      ],
+      "technologies": [
+          "Responsive Web",
+          "Bilingual AR/FR",
+          "RTL",
+          "Dark Mode",
+          "UI/UX",
+          "WhatsApp / Email Order"
+      ],
+      "title": {
+          "ar": "NOVA PASS — موقع تعريفي ثنائي اللغة لبطاقة صحة وامتيازات ذكية",
+          "fr": "NOVA PASS — Site vitrine bilingue pour une carte santé & avantages",
+          "en": "NOVA PASS — Bilingual Showcase Website for a Health & Benefits Card"
+      },
+      "short_description": {
+          "ar": "موقع تعريفي بالعربية والفرنسية لبطاقة ذكية تجمع الملف الطبي الشخصي وتخفيضات لدى الشركاء، مع نمط فاتح وداكن وطلب البطاقة برسالة جاهزة.",
+          "fr": "Site vitrine en arabe et en français pour une carte intelligente réunissant dossier médical personnel et remises chez les partenaires, avec thèmes clair/sombre et demande de carte en un message.",
+          "en": "An Arabic/French showcase website for a smart card combining a personal medical file and partner discounts, with light/dark themes and a ready-made card request message."
+      },
+      "full_description": {
+          "ar": "NOVA PASS موقع تعريفي ثنائي اللغة (العربية مع اتجاه كامل من اليمين إلى اليسار، والفرنسية) يشرح بطاقة ذكية تجمع الرعاية الصحية والامتيازات في بطاقة واحدة: ملف طبي شخصي (فصيلة الدم، الحساسية، العلاجات وجهات اتصال الطوارئ) وتخفيضات لدى عيادات ومؤسسات ومرافق ترفيهية وشركاء. تبدأ الصفحة الرئيسية بواجهة قوية بديكور جزائري مألوف وبطاقة بارزة وزر دعوة واضح، يليها قسم الامتيازات والعروض (ثلاث صيغ) ثم نموذج طلب من أربع خطوات يولّد رسالة جاهزة تُرسل عبر واتساب أو البريد الإلكتروني أو تُنسخ. يدعم الموقع النمطين الفاتح والداكن وزر تبديل اللغة، ويتكيّف مع الهاتف بقائمة برجر، ويضم أسئلة شائعة وقسم تواصل وتذييلاً بالمعلومات القانونية.",
+          "fr": "NOVA PASS est un site vitrine bilingue (arabe en lecture droite-à-gauche native, et français) qui présente une carte intelligente réunissant santé et avantages : un dossier médical personnel (groupe sanguin, allergies, traitements, contacts d'urgence) et des remises chez des cliniques, institutions, lieux de loisirs et partenaires. La page d'accueil s'ouvre sur un hero rassurant dans un décor algérien reconnaissable, avec la carte mise en avant et un appel à l'action clair, suivi des avantages, de trois offres au choix et d'un parcours de demande en quatre étapes qui génère un message prêt à envoyer par WhatsApp, par e-mail ou à copier. Le site propose les thèmes clair et sombre, un bouton de changement de langue, une version mobile avec menu burger, une FAQ, une section contact et un pied de page avec les mentions légales.",
+          "en": "NOVA PASS is a bilingual showcase website (Arabic with fully native right-to-left layout, and French) presenting a smart card that brings healthcare and perks together: a personal medical file (blood group, allergies, treatments, emergency contacts) and discounts at clinics, institutions, leisure venues and partners. The homepage opens with a reassuring hero in a recognizable Algerian setting, the card front and centre and a clear call to action, followed by the benefits, three offers to choose from, and a four-step request flow that generates a ready-to-send message via WhatsApp, email or copy. The site supports light and dark themes, a language switch, a mobile layout with a burger menu, an FAQ, a contact section and a footer with legal information."
+      },
+      "problem": {
+          "ar": "يصعب على الزائر أن يفهم في ثوانٍ ما تقدمه بطاقة ذكية تجمع الصحة والتخفيضات، وكيف يحصل عليها دون إجراءات معقدة.",
+          "fr": "Un visiteur a du mal à comprendre en quelques secondes ce qu'apporte une carte réunissant santé et remises, et comment l'obtenir sans démarches compliquées.",
+          "en": "Visitors struggle to grasp in a few seconds what a card combining health and discounts offers, and how to get one without complicated steps."
+      },
+      "solution": {
+          "ar": "موقع واضح بلغتين ونمطين يشرح العرض في أقسام قليلة، ويحوّل الطلب إلى رسالة جاهزة في أربع خطوات عبر واتساب أو البريد.",
+          "fr": "Un site clair en deux langues et deux thèmes qui explique l'offre en quelques sections et transforme la demande en message prêt à envoyer en quatre étapes, par WhatsApp ou e-mail.",
+          "en": "A clear site in two languages and two themes that explains the offer in a few sections and turns the request into a ready-to-send message in four steps, via WhatsApp or email."
+      },
+      "features": {
+          "ar": [
+              "واجهة رئيسية قوية بديكور جزائري وبطاقة بارزة",
+              "دعم كامل للعربية (RTL) والفرنسية بزر تبديل",
+              "نمط فاتح ونمط داكن",
+              "قسم الامتيازات: تخفيضات الشركاء والملف الطبي الشخصي",
+              "ثلاث صيغ عروض للاختيار",
+              "نموذج طلب من أربع خطوات يولّد رسالة جاهزة",
+              "إرسال الطلب عبر واتساب أو البريد أو النسخ",
+              "نسخة متجاوبة للهاتف بقائمة برجر",
+              "أسئلة شائعة وقسم تواصل ومعلومات قانونية"
+          ],
+          "fr": [
+              "Hero marquant dans un décor algérien avec la carte en vedette",
+              "Arabe (RTL natif) et français avec bouton de langue",
+              "Thèmes clair et sombre",
+              "Section avantages : remises partenaires et dossier médical personnel",
+              "Trois offres au choix",
+              "Formulaire en 4 étapes générant un message prêt à envoyer",
+              "Envoi par WhatsApp, e-mail ou copie du message",
+              "Version mobile responsive avec menu burger",
+              "FAQ, section contact et mentions légales"
+          ],
+          "en": [
+              "Strong hero in an Algerian setting with the card front and centre",
+              "Arabic (native RTL) and French with a language switch",
+              "Light and dark themes",
+              "Benefits section: partner discounts and personal medical file",
+              "Three offers to choose from",
+              "Four-step request form generating a ready-to-send message",
+              "Send via WhatsApp, email or copy the message",
+              "Responsive mobile layout with a burger menu",
+              "FAQ, contact section and legal information"
+          ]
+      },
+      "cover_image_url": "assets/projects/nova-pass/cover.webp",
+      "thumbnail_url": "assets/projects/nova-pass/cover.webp",
+      "gallery": [
+          "assets/projects/nova-pass/cover.webp",
+          "assets/projects/nova-pass/home.webp",
+          "assets/projects/nova-pass/benefits.webp",
+          "assets/projects/nova-pass/order.webp",
+          "assets/projects/nova-pass/mobile.webp",
+          "assets/projects/nova-pass/lang-theme.webp",
+          "assets/projects/nova-pass/steps.webp",
+          "assets/projects/nova-pass/contact.webp",
+          "assets/projects/nova-pass/summary.webp"
+      ]
+  },
+  {
+      "id": "haqqona-legal-app",
+      "featured": false,
+      "year": "2026",
+      "badge": {
+          "ar": "فكرة محمية ومسجلة",
+          "fr": "Idée protégée et déposée",
+          "en": "Protected & Registered Idea"
+      },
+      "likes_count": 1370,
+      "demo_url": "",
+      "categories": [
+          "mobile"
+      ],
+      "technologies": [
+          "Mobile App",
+          "UI/UX Design",
+          "Branding",
+          "Dark Mode"
+      ],
+      "title": {
+          "ar": "حقّ لنا — تصميم تطبيق جوال (الفكرة محمية ومسجلة)",
+          "fr": "Haqqona (حقّ لنا) — Design d'application mobile (idée protégée et déposée)",
+          "en": "Haqqona (حقّ لنا) — Mobile App Design (Protected & Registered Idea)"
+      },
+      "short_description": {
+          "ar": "تصميم هوية وواجهات تطبيق جوال بطابع جزائري، بنمطين فاتح وداكن. فكرة المشروع محمية ومسجلة، وتفاصيلها غير معروضة.",
+          "fr": "Identité visuelle et interfaces d'une application mobile au caractère algérien, en thèmes clair et sombre. L'idée du projet est protégée et déposée ; ses détails ne sont pas publiés.",
+          "en": "Brand identity and interface design for a mobile app with an Algerian character, in light and dark themes. The project idea is protected and registered; its details are not disclosed."
+      },
+      "full_description": {
+          "ar": "«حقّ لنا» مشروع تطبيق جوال قمتُ بتصميم هويته البصرية وواجهاته، بألوان مستوحاة من الهوية الوطنية بلمسات ذهبية وخط واضح ومساحات هادئة، ويدعم النمطين الفاتح والداكن. فكرة المشروع محمية ومسجلة، ولذلك لا يُعرض هنا شرح تفصيلي لها أو لآلية عملها، وتقتصر هذه الصفحة على عرض الجانب التصميمي.",
+          "fr": "« Haqqona » (حقّ لنا) est un projet d'application mobile dont j'ai conçu l'identité visuelle et les interfaces, avec des couleurs inspirées de l'identité nationale, des touches dorées, une typographie claire et des espaces apaisés, en thèmes clair et sombre. L'idée du projet est protégée et déposée : aucune explication détaillée de son concept ni de son fonctionnement n'est donnée ici, cette page se limite à présenter le volet design.",
+          "en": "“Haqqona” (حقّ لنا) is a mobile app project for which I designed the visual identity and interfaces, using colors inspired by the national identity with golden accents, a clear typeface and calm spacing, in both light and dark themes. The project idea is protected and registered, so no detailed explanation of the concept or how it works is provided here; this page only presents the design side."
+      },
+      "cover_image_url": "assets/projects/haqqona/cover.webp",
+      "thumbnail_url": "assets/projects/haqqona/cover.webp",
+      "gallery": [
+          "assets/projects/haqqona/cover.webp",
+          "assets/projects/haqqona/onboarding.webp",
+          "assets/projects/haqqona/home.webp",
+          "assets/projects/haqqona/library.webp",
+          "assets/projects/haqqona/settings.webp",
+          "assets/projects/haqqona/identity.webp"
+      ]
+  },
+  {
     id: "acmm-medical-space",
     featured: true,
     year: "2026",
