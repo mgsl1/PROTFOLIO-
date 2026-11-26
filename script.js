@@ -1182,6 +1182,7 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
       'novamart-store': ['novamart', 'nova mart', 'نوفا مارت'],
       'alnajjar-app': ['al najjar', 'alnajjar', 'najjar', 'النجار', 'نجار', 'menuiserie', 'carpentry'],
       'rihlaty-app': ['rihlaty', 'rihlati', 'رحلتي'],
+      'languicare-speech-care': ['languicare', 'langui care', 'لانغي كير', 'لانجي كير', 'لانغيكير', 'orthophonie', 'speech therapy', 'نطق', 'تقويم النطق', 'langage enfant', 'اضطراب طيف التوحد'],
       'penguchat-messaging': ['penguchat', 'pengu chat', 'pengu', 'بنغوتشات', 'بينغو شات', 'messaging app', 'تطبيق مراسله', 'تطبيق مراسلة'],
       'edupro-learning': ['edupro', 'edu pro', 'ايديو برو', 'اديو برو', 'ايدو برو', 'e learning', 'elearning', 'منصه تعليميه', 'plateforme educative', 'educational platform']
     };

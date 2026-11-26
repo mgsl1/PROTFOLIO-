@@ -20,6 +20,102 @@ const LOCAL_CATEGORIES = [
 
 const LOCAL_PROJECTS = [
   {
+      "id": "languicare-speech-care",
+      "featured": false,
+      "year": "2026",
+      "badge": {
+          "ar": "منصة خدمات",
+          "fr": "Plateforme de services",
+          "en": "Services Platform"
+      },
+      "likes_count": 1385,
+      "demo_url": "https://mgsl1.github.io/LanguiCare/",
+      "categories": [
+          "website"
+      ],
+      "technologies": [
+          "Responsive Web",
+          "Bilingual AR/FR",
+          "RTL",
+          "Dark Mode",
+          "UI/UX",
+          "PHP",
+          "MySQL",
+          "Flutter",
+          "WhatsApp Order"
+      ],
+      "title": {
+          "ar": "LanguiCare — منصة رعاية لغة الطفل وحجز الخدمات",
+          "fr": "LanguiCare — Plateforme d'accompagnement du langage de l'enfant",
+          "en": "LanguiCare — Child Speech & Language Care Platform"
+      },
+      "short_description": {
+          "ar": "منصة تعليمية عصرية بالعربية والفرنسية لمساعدة الأطفال على التواصل والتعلّم، تعرض الخدمات وتتيح طلبها في دقائق عبر واتساب، مع نمط فاتح وداكن وتصميم متجاوب.",
+          "fr": "Plateforme éducative moderne en arabe et en français pour aider les enfants à communiquer et apprendre : services clairs, commande en quelques minutes via WhatsApp, thèmes clair/sombre et design responsive.",
+          "en": "A modern Arabic/French educational platform helping children communicate and learn: clear services, ordering in minutes via WhatsApp, light/dark themes and a fully responsive design."
+      },
+      "full_description": {
+          "ar": "LanguiCare منصة لرعاية لغة الطفل وتواصله، شعارها «تعلّم · تواصل · انمُ». تقدّم الصفحة الرئيسية رسالة واضحة وزرّين بارزين (طلب خدمة وكيف نعمل)، ثم قسم الخدمات: تقييم اللغة والتواصل، حصص تقويم النطق، مرافقة اضطراب طيف التوحد، الجلسات عن بُعد (من 2000 دج)، إرشاد وتكوين الأولياء (من 3000 دج)، وبيع كتب PDF للأطفال المصابين بالتوحد (من 1000 دج). يمرّ الطلب بأربع خطوات بسيطة: اختيار الخدمة، ملء الطلب، الإرسال عبر واتساب، ثم تأكيد الموعد. يدعم الموقع العربية (RTL) والفرنسية، والنمطين الفاتح والداكن، ويضم أسئلة شائعة وقسم تواصل (هاتف، بريد، ساعات العمل) وتذييلاً غنياً بنشرة بريدية وروابط مفيدة، مع شارات الثقة (دفع آمن، بيانات محمية، رد سريع). بُني بتقنيات PHP وMySQL مع واجهة ويب متجاوبة، ويُكمله تطبيق Flutter.",
+          "fr": "LanguiCare est une plateforme d'accompagnement du langage et de la communication de l'enfant, sous la signature « Apprendre · Communiquer · Grandir ». La page d'accueil pose un message clair avec deux appels à l'action (commander un service, comment ça marche), puis présente les services : bilan du langage et de la communication, séances de rééducation, accompagnement TSA, séances en visio (dès 2 000 DA), guidance et formation des parents (dès 3 000 DA) et vente de livres PDF pour enfants autistes (dès 1 000 DA). La commande se fait en quatre étapes simples : choisir le service, remplir la demande, l'envoyer via WhatsApp, puis confirmer le rendez-vous. Le site propose l'arabe (RTL) et le français, les thèmes clair et sombre, une FAQ, une section contact (téléphone, e-mail, horaires) et un pied de page complet avec newsletter et liens utiles, ainsi que des badges de confiance (paiement sécurisé, données protégées, réponse rapide). Il repose sur PHP et MySQL avec une interface web responsive, complétée par une application Flutter.",
+          "en": "LanguiCare is a platform supporting children's language and communication, under the tagline “Learn · Communicate · Grow”. The homepage opens with a clear message and two prominent actions (order a service, how it works), followed by the services: language and communication assessment, speech therapy sessions, autism (ASD) support, online sessions (from 2,000 DA), parent guidance and training (from 3,000 DA), and PDF books for autistic children (from 1,000 DA). Ordering takes four simple steps: choose the service, fill in the request, send it via WhatsApp, then confirm the appointment. The site supports Arabic (RTL) and French, light and dark themes, an FAQ, a contact section (phone, email, opening hours) and a rich footer with a newsletter and useful links, plus trust badges (secure payment, protected data, fast response). It is built with PHP and MySQL and a responsive web interface, complemented by a Flutter app."
+      },
+      "problem": {
+          "ar": "يحتاج الأولياء إلى فهم الخدمات المناسبة لطفلهم وطلبها بسهولة، دون تعقيدات ولا تنقّل، وبثقة وأمان.",
+          "fr": "Les parents ont besoin de comprendre quel service convient à leur enfant et de le commander facilement, sans démarches compliquées ni déplacements, en toute confiance.",
+          "en": "Parents need to understand which service suits their child and order it easily, without complicated steps or travel, and with confidence."
+      },
+      "solution": {
+          "ar": "منصة واضحة ودافئة تعرض الخدمات بأسعارها ومدّتها، وتحوّل الطلب إلى أربع خطوات عبر واتساب، بتجربة متجاوبة على كل الأجهزة وبلغتين.",
+          "fr": "Une plateforme claire et chaleureuse qui présente les services avec tarifs et durées et transforme la commande en quatre étapes via WhatsApp, avec une expérience responsive sur tous les appareils et en deux langues.",
+          "en": "A clear, welcoming platform that presents services with prices and durations and turns ordering into four steps via WhatsApp, with a responsive experience on every device and in two languages."
+      },
+      "features": {
+          "ar": [
+              "واجهة رئيسية دافئة برسالة واضحة وأزرار دعوة بارزة",
+              "قسم خدمات بالأسعار والمدّة: تقييم، جلسات، توحد، كتب PDF",
+              "جلسات عن بُعد وإرشاد وتكوين للأولياء",
+              "مسار طلب من أربع خطوات عبر واتساب وتأكيد الموعد",
+              "دعم العربية (RTL) والفرنسية بزر تبديل",
+              "نمط فاتح ونمط داكن",
+              "تصميم متجاوب بقائمة جوال وتنقّل بديهي",
+              "أسئلة شائعة بأكورديون وقسم تواصل بساعات العمل",
+              "تذييل بنشرة بريدية وروابط مفيدة وشارات الثقة"
+          ],
+          "fr": [
+              "Accueil chaleureux avec message clair et appels à l'action",
+              "Section services avec tarifs et durées : bilan, séances, TSA, livres PDF",
+              "Séances en visio et guidance/formation des parents",
+              "Parcours de commande en 4 étapes via WhatsApp et confirmation du rendez-vous",
+              "Arabe (RTL) et français avec bouton de langue",
+              "Thèmes clair et sombre",
+              "Design responsive avec menu mobile et navigation intuitive",
+              "FAQ en accordéon et section contact avec horaires",
+              "Pied de page avec newsletter, liens utiles et badges de confiance"
+          ],
+          "en": [
+              "Welcoming homepage with a clear message and prominent calls to action",
+              "Services section with prices and durations: assessment, sessions, ASD, PDF books",
+              "Online sessions and parent guidance and training",
+              "Four-step ordering flow via WhatsApp with appointment confirmation",
+              "Arabic (RTL) and French with a language switch",
+              "Light and dark themes",
+              "Responsive design with a mobile menu and intuitive navigation",
+              "Accordion FAQ and a contact section with opening hours",
+              "Footer with newsletter, useful links and trust badges"
+          ]
+      },
+      "cover_image_url": "assets/projects/languicare/cover.webp",
+      "thumbnail_url": "assets/projects/languicare/cover.webp",
+      "gallery": [
+          "assets/projects/languicare/hero.webp",
+          "assets/projects/languicare/services.webp",
+          "assets/projects/languicare/faq.webp",
+          "assets/projects/languicare/mobile.webp",
+          "assets/projects/languicare/mobile-nav.webp",
+          "assets/projects/languicare/contact.webp"
+      ]
+  },
+  {
       "id": "nova-pass-card",
       "featured": false,
       "year": "2026",
